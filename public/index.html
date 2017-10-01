@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title> Event Notifications </title>
+	<!-- Bootstrap -->
+	<link rel="stylesheet" type="text/css" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+	<!-- Google SignIn -->
+	<meta name="google-signin-client_id" content="403176586402-2573bsbcg6ltedsgra1s5lgs5065mbuk.apps.googleusercontent.com">
+</head>
+<body>
+	<div class="container">
+		<div class="row" style="margin-top: 150px;">
+			<div class="col-md-4 col-md-offset-4">
+				<div class="login-box" style="height: 300px; background-color: #e3e3e3; text-align: center; border-radius: 5px; padding: 50px;">
+					<h1 style="font-size: 30px; margin-bottom: 40px;"> IIT Kanpur Event Notifications </h1>
+					<div class="g-signin2" data-onsuccess="onSignIn" style="padding-left: 70px;"></div>		
+				</div>
+			</div>
+		</div>
+	</div>
+
+ 	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+ 	<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+	<script src="https://apis.google.com/js/platform.js" async defer></script>
+	<script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.6.4/angular.min.js"></script>
+
+	<script>
+		function onSignIn(googleUser) {
+			var profile = googleUser.getBasicProfile();
+			var data = {
+				profileId	: profile.getId(),
+				name 		: profile.getName(),
+				imageUrl 	: profile.getImageUrl(),
+				email 		: profile.getEmail()
+			};	
+
+			$.post('/user/login', data, function(response) {
+				window.location = response.url;
+			})
+		}
+	</script>
+
+</body>
+</html> 

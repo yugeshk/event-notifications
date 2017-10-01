@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+	<script type="text/javascript">
+		$.ajax({
+			type: 'POST',
+			url: '/user/isLoggedIn',
+			success: function() {
+				console.log('LoggedIn');
+			},
+			error: function() {
+				console.log('Error, not LoggedIn');
+				window.location = '/index.html';
+			}
+		})
+	</script>
+	<title> User Page </title>
+	<!-- Bootstrap -->
+	<link rel="stylesheet" type="text/css" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+	<meta name="google-signin-client_id" content="403176586402-2573bsbcg6ltedsgra1s5lgs5065mbuk.apps.googleusercontent.com">
+
+</head>
+<body ng-app="Events" ng-controller="EventsController">
+	<h1> User Page </h1>
+	<div class="container">
+		<div class="col-md-9">
+			<div class="event" ng-repeat="event in events.data" style="background-color: #f0f0ea; padding: 20px;border-radius: 10px; margin: 5px;">
+				<h3> {{event.name}} @ {{event.location}}</h3>
+				<p> {{event.start_time | date: ' HH:mm dd/MM/yyyy '}} to {{event.end_time | date: ' HH:mm dd/MM/yyyy '}} </p>
+				<p> {{event.description}} </p>
+				<p> {{event.publishedBy}} </p>	
+			</div>
+		</div>
+	</div>
+	<div>
+		<a href="#" onclick="signOut();">Sign out</a>
+	</div>
+ 	<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+	<script src="https://apis.google.com/js/platform.js?onload=onLoad" async defer></script>
+	<script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.6.4/angular.min.js"></script>
+	<script type="text/javascript">
+		var app = angular.module("Events", []);
+		app.controller("EventsController", function($scope, $http) {
+			// Some Initial Value
+			$scope.events = [];
+
+			var getEventsPostOptions = { method: 'POST', url: '/user/getEvents' };
+		
+			function getEventsSuccessFunction(response) {
+				$scope.events = response.data;
+			}
+
+			function getEventsFailureFunction(response) {
+				console.log(response);
+			}
+
+  			
+			$http(getEventsPostOptions).then(getEventsSuccessFunction, getEventsFailureFunction);
+		});
+	</script>
+	<script>
+		function signOut() {
+			var auth2 = gapi.auth2.getAuthInstance();
+			auth2.signOut().then(function reportSignOut() {
+				console.log('User signed out.');
+				$.post('/user/logout', {}, function(response) {
+					window.location = response.url;
+				})
+			}, function reportCouldNotSignOut() {
+				console.log('Could Not Sign Out');
+			});
+		}
+
+		function onLoad() {
+      		gapi.load('auth2', function() {
+        		gapi.auth2.init();
+      		});
+    	}
+	</script>
+</body>
+</html>
