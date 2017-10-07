@@ -34,7 +34,8 @@ def logout(request):
 	if(request.method != 'POST'):
 		return redirect('/index.html')
 	
-	request.session['profileId'] = ''
+	#request.session['profileId'] = ''
+	request.session.flush()
 	return JsonResponse({ 'url': '/index.html'})		
 
 @csrf_exempt
