@@ -5,10 +5,10 @@ from django.db import models
 class User(models.Model):
     name 		= models.CharField(max_length=200)
     email 		= models.CharField(max_length=200)
-    profileId 	= models.CharField(max_length=200)
+    profileId 	= models.CharField(max_length=200, primary_key=True)
     imageUrl 	= models.CharField(max_length=200)
-    rollNumber 	= models.CharField(max_length=200)
-    department 	= models.CharField(max_length=200)
+    rollNumber 	= models.IntegerField()
+    department 	= models.CharField(max_length=200) #should provide options here rather than asking user to fill
     
     def __str__(self):
         return self.name + '-' + self.email + '-' + self.profileId + '-' + self.imageUrl

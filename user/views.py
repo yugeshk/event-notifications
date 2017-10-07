@@ -12,7 +12,7 @@ def login(request):
 	if(request.method != 'POST'):
 		return redirect('/index.html')
 
-	# Should clean/validate data here - what?
+	# Should clean/validate data here
 	post = request.POST
 	query = User.objects.filter(profileId=post['profileId'])
 

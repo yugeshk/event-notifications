@@ -6,6 +6,11 @@
 	<link rel="stylesheet" type="text/css" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
 	<!-- Google SignIn -->
 	<meta name="google-signin-client_id" content="403176586402-2573bsbcg6ltedsgra1s5lgs5065mbuk.apps.googleusercontent.com">
+	<style type="text/css">
+		#button1 , #button2 {
+		display:inline-block;
+	}
+	</style>
 </head>
 <body>
 	<div class="container">
@@ -13,7 +18,10 @@
 			<div class="col-md-4 col-md-offset-4">
 				<div class="login-box" style="height: 300px; background-color: #e3e3e3; text-align: center; border-radius: 5px; padding: 50px;">
 					<h1 style="font-size: 30px; margin-bottom: 40px;"> IIT Kanpur Event Notifications </h1>
-					<div class="g-signin2" data-onsuccess="onSignIn" style="padding-left: 70px;"></div>		
+					<div class="row">
+						<div class="g-signin2" data-onsuccess="onSignIn" style="padding-left: 70px;"></div>
+						<div class="btn btn-light" onclick="SignUp()" style="padding-left: 10px; padding-bottom: 10px">Sign Up</button>
+					</div>		
 				</div>
 			</div>
 		</div>
@@ -37,6 +45,11 @@
 			$.post('/user/login', data, function(response) {
 				window.location = response.url;
 			})
+		}
+	</script>
+	<script type="text/javascript">
+		function SignUp() {
+			window.location = '/signUp.html';
 		}
 	</script>
 
