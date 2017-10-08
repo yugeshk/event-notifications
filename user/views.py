@@ -29,7 +29,6 @@ def login(request):
 		print(request.session['profileId'])
 		return JsonResponse({ 'url': '/user.html'})
 
-#create a signup rather than using login for both login and signup
 @csrf_exempt
 def signUp(request):
 	if(request.method != 'POST'):

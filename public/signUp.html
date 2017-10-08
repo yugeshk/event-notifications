@@ -17,7 +17,7 @@
 
 	<script type="text/javascript">
 		function onSignUp(data) {
-			$.post('/user/signUp', data, function(response) {
+			$.post('/user/signUp',{userType:data}, function(response) {
 				window.location = response.url;
 			})
 		}
