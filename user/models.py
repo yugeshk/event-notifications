@@ -7,7 +7,7 @@ class User(models.Model):
     email 		= models.CharField(max_length=200)
     profileId 	= models.CharField(max_length=200, primary_key=True)
     imageUrl 	= models.CharField(max_length=200)
-    rollNumber 	= models.IntegerField()
+    rollNumber 	= models.CharField(max_length=200)
     department 	= models.CharField(max_length=200) #should provide options here rather than asking user to fill
     
     def __str__(self):

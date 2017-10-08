@@ -22,19 +22,20 @@ def login(request):
 		user.save()
 		request.session['profileId'] = user['profileId']
 		print(request.session['profileId'])
-		return JsonResponse({ 'url': '/userSettings.html'})
+		return JsonResponse({ 'url': '/signUp.html'})
 	else:
 		# Old User
 		request.session['profileId'] = query.first().profileId
 		print(request.session['profileId'])
 		return JsonResponse({ 'url': '/user.html'})
 
+#create a signup rather than using login for both login and signup
+
 @csrf_exempt
 def logout(request):
 	if(request.method != 'POST'):
 		return redirect('/index.html')
 	
-	#request.session['profileId'] = ''
 	request.session.flush()
 	return JsonResponse({ 'url': '/index.html'})		
 
