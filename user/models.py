@@ -2,13 +2,13 @@ from django.db import models
 
 # Create your models here.
 
-class User(models.Model):
+class baseUser(models.Model):
     name 		= models.CharField(max_length=200)
     email 		= models.CharField(max_length=200)
     profileId 	= models.CharField(max_length=200, primary_key=True)
     imageUrl 	= models.CharField(max_length=200)
-    rollNumber 	= models.CharField(max_length=200)
-    department 	= models.CharField(max_length=200) #should provide options here rather than asking user to fill
+    userType	= models.CharField(max_length=200)
+
     
     def __str__(self):
         return self.name + '-' + self.email + '-' + self.profileId + '-' + self.imageUrl
@@ -28,7 +28,7 @@ class Category(models.Model):
 	name 		= models.CharField(max_length=200)
 
 class UserCategory(models.Model):
-	userId 		= models.ForeignKey(User, on_delete=models.CASCADE)
+	userId 		= models.ForeignKey(baseUser, on_delete=models.CASCADE)
 	categoryId 	= models.ForeignKey(Category, on_delete=models.CASCADE)
 
 class EventCategory(models.Model):

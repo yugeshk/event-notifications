@@ -8,34 +8,18 @@
 </head>
 <body>
 	<h1>This is the Sign Up Page</h1>
-	<button onclick="onSignIn();">Sign Up as User</button>
-	<div class="g-signin2" data-onsuccess="onSignIn" style="padding-left: 70px;"></div>
-	<button onclick="onSignUpPublisher();" type="Submit" name="UserType" value="publisher">Sign Up as publisher</button>
+	<button onclick="onSignUp('user');" type="Submit" name="UserType" value="user">Sign Up as User</button>
+	<button onclick="onSignUp('user');" type="Submit" name="UserType" value="publisher">Sign Up as publisher</button>
 	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
  	<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
 	<script src="https://apis.google.com/js/platform.js" async defer></script>
 	<script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.6.4/angular.min.js"></script>
 
 	<script type="text/javascript">
-		function onSignIn(googleUser) {
-			var profile = googleUser.getBasicProfile();
-			var data = {
-				profileId	: profile.getId(),
-				name 		: profile.getName(),
-				imageUrl 	: profile.getImageUrl(),
-				email 		: profile.getEmail()
-			};	
-
-			$.post('/user/login', data, function(response) {
+		function onSignUp(data) {
+			$.post('/user/signUp', data, function(response) {
 				window.location = response.url;
 			})
-		}
-	</script>
-	
-	<!-- change this script after first button starts working -->
-	<script type="text/javascript">
-		function onSignUpPublisher(googleUser) {
-			window.location = '/index.html'
 		}
 	</script>
 </body>

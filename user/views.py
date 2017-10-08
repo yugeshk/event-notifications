@@ -1,6 +1,6 @@
 from django.shortcuts import render, redirect
 from django.http import HttpResponse, JsonResponse
-from user.models import User
+from user.models import baseUser
 from django.views.decorators.csrf import csrf_exempt
 from django import forms
 import json
@@ -14,11 +14,11 @@ def login(request):
 
 	# Should clean/validate data here
 	post = request.POST
-	query = User.objects.filter(profileId=post['profileId'])
+	query = baseUser.objects.filter(profileId=post['profileId'])
 
 	if(len(query)==0):
 		# First Time User 
-		user = User(name=post['name'], email=post['email'], profileId=post['profileId'], imageUrl=post['imageUrl'])
+		user = baseUser(name=post['name'], email=post['email'], profileId=post['profileId'], imageUrl=post['imageUrl'])
 		user.save()
 		request.session['profileId'] = user['profileId']
 		print(request.session['profileId'])
@@ -30,6 +30,20 @@ def login(request):
 		return JsonResponse({ 'url': '/user.html'})
 
 #create a signup rather than using login for both login and signup
+@csrf_exempt
+def signUp(request):
+	if(request.method != 'POST'):
+		return redirect('/index.html')
+	post = request.POST
+	profile = request.session['profileId']
+	user = baseUser(profileId=profile,userType=post['userType'])
+	user.save()
+	if(post['userType']=="user"):
+		return JsonResponse({'url':'/userSettings.html'})
+	elif(post['userType']=="publisher"):
+		return JsonResponse({'url':'/publisherSettings.html'})
+	else:
+		return HttpResponse(status=500)
 
 @csrf_exempt
 def logout(request):
