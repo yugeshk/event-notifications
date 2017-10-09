@@ -1,6 +1,6 @@
 from django.shortcuts import render, redirect
 from django.http import HttpResponse, JsonResponse
-from user.models import baseUser
+from user.models import baseUser, userSettings
 from django.views.decorators.csrf import csrf_exempt
 from django import forms
 import json
@@ -73,8 +73,23 @@ def saveCategories(request):
 	return HttpResponse("Hello World. You're at the poll index. SAVECATEGORIES")
 def getSettings(request):
 	return HttpResponse("Hello World. You're at the poll index. GETSETTINGS")
+
+@csrf_exempt
 def saveSettings(request):
-	return HttpResponse("Hello World. You're at the poll index. SAVESETTINGS")
+	if(request.method != 'POST'):
+		return redirect('/index.html')
+
+	post = request.POST
+	profile = request.session['profileId']
+	user=userSettings.objects.get(profileId=profile)
+	if(user.userType=="user"):
+		user.rollNumber=post['rollNumber']
+		user.department=post['department']
+		user.save()
+		return redirect('/user.html')
+	elif(user.userType=="publisher"):
+		return HttpResponse("Hello World. You're at the poll index. SAVESETTINGS")
+
 
 @csrf_exempt
 def getEvents(request):

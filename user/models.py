@@ -13,6 +13,14 @@ class baseUser(models.Model):
     def __str__(self):
         return self.name + '-' + self.email + '-' + self.profileId + '-' + self.imageUrl
 
+class userSettings(models.Model):
+	profileId	=models.ForeignKey(baseUser, on_delete=models.CASCADE)
+	rollNumber	=models.CharField(max_length=6)
+	department	=models.CharField(max_length=50)
+
+	def __str__(self):
+		return self.profileId + '-' + self.rollNumber + '-' + self.department
+
 class Event(models.Model):
 	name 			= models.CharField(max_length=200)
 	start_time 		= models.DateTimeField()
