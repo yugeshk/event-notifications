@@ -36,6 +36,7 @@
 	<div>
 		<a href="#" onclick="signOut();">Sign out</a>
 	</div>
+	<button onclick="editSettings();">Edit Settings</button> 
  	<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
 	<script src="https://apis.google.com/js/platform.js?onload=onLoad" async defer></script>
 	<script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.6.4/angular.min.js"></script>
@@ -58,6 +59,11 @@
   			
 			$http(getEventsPostOptions).then(getEventsSuccessFunction, getEventsFailureFunction);
 		});
+	</script>
+	<script type="text/javascript"> 
+		function editSettings() {
+			window.location = '/userSettings.html';
+		}
 	</script>
 	<script>
 		function signOut() {

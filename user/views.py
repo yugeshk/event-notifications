@@ -78,16 +78,21 @@ def getSettings(request):
 def saveSettings(request):
 	if(request.method != 'POST'):
 		return redirect('/index.html')
-
 	post = request.POST
 	profile = request.session['profileId']
-	user=userSettings.objects.get(profileId=profile)
-	if(user.userType=="user"):
-		user.rollNumber=post['rollNumber']
-		user.department=post['department']
-		user.save()
-		return redirect('/user.html')
-	elif(user.userType=="publisher"):
+	baseUserData = baseUser.objects.get(profileId=profile)
+	if(baseUserData.userType=='user'):
+		if(userSettings.objects.filter(profileId=baseUserData)):
+			user=userSettings.objects.get(profileId=profile)
+			user.delete()
+			user=userSettings(profileId=baseUser.objects.get(profileId=profile),rollNumber=post['rollNumber'],department=post['department'])
+			user.save()
+			return redirect('/user.html')
+		else:
+			user=userSettings(profileId=baseUser.objects.get(profileId=profile),rollNumber=post['rollNumber'],department=post['department'])
+			user.save()
+			return redirect('/user.html')
+	elif(baseUserData.userType=="publisher"):
 		return HttpResponse("Hello World. You're at the poll index. SAVESETTINGS")
 
 
