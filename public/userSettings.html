@@ -20,12 +20,38 @@
 	<link rel="stylesheet" type="text/css" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
 </head>
 <body>
-	<h1> User Settings </h1>
 	<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
 	<script src="https://apis.google.com/js/platform.js" async defer></script>
 	<script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.6.4/angular.min.js"></script>
 	<div class="container">
-		
+		<h1> User Settings </h1>
+		<form method="post" action="/user.html">
+			Roll Number : <input type="text" name="rollNumber" required pattern="[0-9]{6}" title="6 digit IITK Roll Number" placeholder="eg. 170830">
+			<br><br>
+			Department : <select name="department">
+				<option value="aero">Aerospace Engineering</option>
+				<option value="bsbse">Biological Sciences And Bioengineering</option>
+				<option value="che">Chemical Engineering</option>
+				<option value="ce">Civil Engineering</option>
+				<option value="cse">Computer Science and Engineering</option>
+				<option value="ee">Electrical Engineering</option>
+				<option value="mse">Material Sciences And Engineering</option>
+				<option value="me">Mechanical Engineering</option>
+				<option value="ime">Industrial Management And Engineering</option>
+				<option value="chm">BS Chemistry</option>
+				<option value="phy">BS Physics</option>
+				<option value="es">BS Earth Sciences</option>
+				<option value="mth">Mathematics and Scientific Computing</option>
+				<option value="eoc">BS Economics</option>
+			</select>
+			<br><br>
+			Alerts : <br>
+			<input type="checkbox" name="1">Programming
+			<input type="checkbox" name="2">Robotics
+			<input type="checkbox" name="3">Electronics
+			<br><br>
+			<input type="submit" value ="Submit">
+		</form>		
 	</div>
 </body>
 </html>
