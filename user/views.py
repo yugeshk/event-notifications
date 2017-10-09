@@ -20,7 +20,7 @@ def login(request):
 		# First Time User 
 		user = baseUser(name=post['name'], email=post['email'], profileId=post['profileId'], imageUrl=post['imageUrl'])
 		user.save()
-		request.session['profileId'] = user['profileId']
+		request.session['profileId'] = user.profileId
 		print(request.session['profileId'])
 		return JsonResponse({ 'url': '/signUp.html'})
 	else:
@@ -35,7 +35,10 @@ def signUp(request):
 		return redirect('/index.html')
 	post = request.POST
 	profile = request.session['profileId']
-	user = baseUser(profileId=profile,userType=post['userType'])
+	#user = baseUser(profileId=profile,userType=post['userType'])
+	#user.save()
+	user=baseUser.objects.get(profileId=profile)
+	user.userType=post['userType']
 	user.save()
 	if(post['userType']=="user"):
 		return JsonResponse({'url':'/userSettings.html'})
