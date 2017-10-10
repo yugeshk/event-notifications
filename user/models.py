@@ -26,9 +26,12 @@ class publisherSettings(models.Model):
 	displayName	= models.CharField(max_length=100)
 	website		= models.CharField(max_length=100)
 	contentType	= models.CharField(max_length=100)
+	verifiedPublisher = models.CharField(max_length=5, default='false')
+	contactNumber =models.CharField(max_length=10, default='')
 
 	def __str__(self):
 		return self.profileId + '-' + self.displayName + '-' + self.website + '-' + self.contentType
+
 class Event(models.Model):
 	name 			= models.CharField(max_length=200)
 	start_time 		= models.DateTimeField()

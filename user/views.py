@@ -74,6 +74,8 @@ def saveCategories(request):
 def getSettings(request):
 	return HttpResponse("Hello World. You're at the poll index. GETSETTINGS")
 
+#Change the method to edit settings. at the moment it works on delete save
+
 @csrf_exempt
 def saveSettings(request):
 	if(request.method != 'POST'):
@@ -96,9 +98,19 @@ def saveSettings(request):
 		if(publisherSettings.objects.filter(profileId=baseUserData)):
 			user=publisherSettings.objects.get(profileId=profile)
 			user.delete()
-			user=publisherSettings(profileId=baseUser.objects.get(profileId=profile),displayName=post['name'],website=post['website'])
+			user=publisherSettings(profileId=baseUser.objects.get(profileId=profile),displayName=post['Alias'],website=post['website'], contactNumber=post['contactNumber'])
 			user.save()
-			return redirect('/publisher.html')
+			if(user.verifiedPublisher=='true'):
+				return redirect('/publisher.html')
+			else:
+				return redirect('/publisherVerification.html')
+		else:
+			user=publisherSettings(profileId=baseUser.objects.get(profileId=profile),displayName=post['Alias'],website=post['website'], contactNumber=post['contactNumber'])
+			user.save()
+			if(user.verifiedPublisher=='true'):
+				return redirect('/publisher.html')
+			else:
+				return redirect('/publisherVerification.html')
 	return HttpResponse(status=500)
 
 
