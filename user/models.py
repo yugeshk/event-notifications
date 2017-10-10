@@ -21,6 +21,14 @@ class userSettings(models.Model):
 	def __str__(self):
 		return self.profileId + '-' + self.rollNumber + '-' + self.department
 
+class publisherSettings(models.Model):
+	profileId	= models.ForeignKey(baseUser, on_delete=models.CASCADE)
+	displayName	= models.CharField(max_length=100)
+	website		= models.CharField(max_length=100)
+	contentType	= models.CharField(max_length=100)
+
+	def __str__(self):
+		return self.profileId + '-' + self.displayName + '-' + self.website + '-' + self.contentType
 class Event(models.Model):
 	name 			= models.CharField(max_length=200)
 	start_time 		= models.DateTimeField()

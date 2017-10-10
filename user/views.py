@@ -1,6 +1,6 @@
 from django.shortcuts import render, redirect
 from django.http import HttpResponse, JsonResponse
-from user.models import baseUser, userSettings
+from user.models import baseUser, userSettings, publisherSettings
 from django.views.decorators.csrf import csrf_exempt
 from django import forms
 import json
@@ -93,7 +93,13 @@ def saveSettings(request):
 			user.save()
 			return redirect('/user.html')
 	elif(baseUserData.userType=="publisher"):
-		return HttpResponse("Hello World. You're at the poll index. SAVESETTINGS")
+		if(publisherSettings.objects.filter(profileId=baseUserData)):
+			user=publisherSettings.objects.get(profileId=profile)
+			user.delete()
+			user=publisherSettings(profileId=baseUser.objects.get(profileId=profile),displayName=post['name'],website=post['website'])
+			user.save()
+			return redirect('/publisher.html')
+	return HttpResponse(status=500)
 
 
 @csrf_exempt
