@@ -7,30 +7,18 @@
 </head>
 <body>
 	<div class="container">
-		<h1>This is the Pubisher settings Page.</h1>
-		<form method="post" action="/user/saveSettings">
-			Alias :<input type="text" name="Alias" required placeholder="eg. Robotics Club, IITK">
-			<br><br>
-			Website :<input type="text" name="website" required placeholder="www.example.com">
-			<br><br>
-			Contact Number for Verification :<input type="text" name="contactNumber">
-			<br><br>
-			<input type="radio" id="oldTrue" name="categoryName" value="Programming">Programming
-			<input type="radio" id="oldTrue" name="categoryName" value="Robotics">Robotics
-			<input type="radio" id="oldTrue" name="categoryName" value="Electronics">Electronics
-			<input type="radio" id="oldFalse" name="other">Other, Pls specify:
-			<input type="text"  id="newCategory" name="categoryName" disabled="disabled">
-			<br><br>
-			<input type="submit" value="submit">
-		</form>
-		<script type="text/javascript">
-			$('#oldFalse').click(function() {
-  					$('#newCategory').removeAttr("disabled");
-			});
-			$('#oldTrue').click(function() {
-  					$('#newCategory').attr("disabled","disabled");
-			});
-		</script>
-	</div>
+		<div>
+			<h1>This is the Pubisher settings Page.</h1>
+			<form method="post" action="/user/saveSettings">
+				Alias : <input type="text" name="Alias" required placeholder="eg. Robotics Club, IITK">
+				<br><br>
+				Website : <input type="text" name="website" required placeholder="www.example.com">
+				<br><br>
+				Contact Number for Verification : <input type="tel" name="contactNumber">
+				<br><br>
+				<input type="submit" value="Submit">
+		</div>
+	</form>
+</div>
 </body>
 </html>

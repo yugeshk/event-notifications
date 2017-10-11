@@ -2,11 +2,18 @@
 <html>
 <head>
 	<title>Publisher Home Page</title>
+	<!-- Bootstrap -->
+	<link rel="stylesheet" type="text/css" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
 </head>
 <body>
-	<h1>This is the publisher home page</h1>
-	<form>
-		<input type="text" name="location"><input type="" name="">
-	</form>
+	<div class="container">
+		<h1>This is the publisher home page</h1>
+		<button onclick="create();">Create New Events</button>
+	</div>
+	<script type="text/javascript">
+		function create() {
+			window.location = '/newEvent.html'
+		}
+	</script>
 </body>
 </html>
