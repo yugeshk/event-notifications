@@ -19,7 +19,7 @@
 	<!-- Bootstrap -->
 	<link rel="stylesheet" type="text/css" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
 </head>
-<body>
+<body ng-app="Category" ng-controller="CategoryController" >
 	<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
 	<script src="https://apis.google.com/js/platform.js" async defer></script>
 	<script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.6.4/angular.min.js"></script>
@@ -45,13 +45,33 @@
 				<option value="BS Economics">BS Economics</option>
 			</select>
 			<br><br>
-			Alerts : <br>
-			<input type="checkbox" name="1">Programming
-			<input type="checkbox" name="2">Robotics
-			<input type="checkbox" name="3">Electronics
+			You would like to be notified about which of the following? : <br>
 			<br><br>
+			<div class="categories" ng-repeat="categories in category">
+				<input type="checkbox" id="check" name="selectedCategory" value={{categories.pk}}>
+				<label for="check">{{categories.fields.name}}</label>
+			</div>
 			<input type="submit" value ="Submit">
-		</form>		
+		</form>
+		<script type="text/javascript">
+			var app= angular.module("Category",[]);
+			app.controller("CategoryController",function($scope,$http) {
+
+			$scope.category =[];
+			var getCaterogyGetOption = {method : 'GET', url :'/user/getCategories'}
+
+			function getCategoriesSuccessFunction(response) {
+				$scope.category = JSON.parse(response.data.categoryJson);
+				console.log($scope.category)
+			}
+
+			function getCategoriesFailureFunction(response) {
+				console.log(response)
+			}
+
+			$http(getCaterogyGetOption).then(getCategoriesSuccessFunction, getCategoriesFailureFunction);
+			});
+		</script>		
 	</div>
 </body>
 </html>

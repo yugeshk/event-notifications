@@ -45,9 +45,10 @@ class Event(models.Model):
 		return self.name + '-' +self.url + '-' + self.location + '-' + self.description + '-' +self.profileId.profileId
 
 class Category(models.Model):
+	id 			= models.CharField(max_length=2,primary_key=True,default='')
 	name 		= models.CharField(max_length=200)
 
-class UserCategory(models.Model):
+class userCategory(models.Model):
 	userId 		= models.ForeignKey(baseUser, on_delete=models.CASCADE)
 	categoryId 	= models.ForeignKey(Category, on_delete=models.CASCADE)
 

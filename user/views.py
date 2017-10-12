@@ -1,9 +1,10 @@
 from django.shortcuts import render, redirect
 from django.http import HttpResponse, JsonResponse
-from user.models import baseUser, userSettings, publisherSettings, Event
+from user.models import baseUser, userSettings, publisherSettings, Event, Category, userCategory
 from django.views.decorators.csrf import csrf_exempt
 from django import forms
 import json
+from django.core import serializers
 
 # Create your views here.
 
@@ -86,8 +87,15 @@ def newEvent(request):
 		return request('/publisherVerification.html')
 	return HttpResponse(status=500)
 
+def getAllCategories(request):
+	return HttpResponse(status=500)
 
 def getCategories(request):
+	if(request.method=='GET'):
+		categoryJson = serializers.serialize("json", Category.objects.all())
+		data = {"categoryJson" : categoryJson}
+		#print(data)
+		return JsonResponse(data)
 	# Identify user using request.session['profileId']
 	# Return array of all categories having boolean to show if user is interested or not.
 	# eg Response [{ name: 'Coding', interested: true }, { name: 'Robotics', interested: false }]
@@ -108,16 +116,31 @@ def saveSettings(request):
 	post = request.POST
 	profile = request.session['profileId']
 	baseUserData = baseUser.objects.get(profileId=profile)
+	print(post)
 	if(baseUserData.userType=='user'):
 		if(userSettings.objects.filter(profileId=baseUserData)):
 			user=userSettings.objects.get(profileId=profile)
 			user.delete()
 			user=userSettings(profileId=baseUser.objects.get(profileId=profile),rollNumber=post['rollNumber'],department=post['department'])
 			user.save()
+			for i in range (0,7):
+				if(post['selectedCategory']==str(i)):
+					categoryData=Category.objects.get(id=i)
+					form=userCategory(userId=baseUserData,categoryId=categoryData)
+					instance = form.save(commit=False)
+					instance.pk=None
+					instance.save()
 			return redirect('/user.html')
 		else:
 			user=userSettings(profileId=baseUser.objects.get(profileId=profile),rollNumber=post['rollNumber'],department=post['department'])
 			user.save()
+			for i in range (0,7):
+				if(post['selectedCategory']==str(i)):
+					categoryData=Category.objects.get(id=i)
+					form=userCategory(userId=baseUserData,categoryId=categoryData)
+					instance = form.save(commit=False)
+					instance.pk=None
+					instance.save()
 			return redirect('/user.html')
 	elif(baseUserData.userType=="publisher"):
 		if(publisherSettings.objects.filter(profileId=baseUserData)):
