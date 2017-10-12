@@ -116,31 +116,29 @@ def saveSettings(request):
 	post = request.POST
 	profile = request.session['profileId']
 	baseUserData = baseUser.objects.get(profileId=profile)
-	print(post)
+	selected = dict(post)
+	#print(post['selectedCategory'][1])
 	if(baseUserData.userType=='user'):
 		if(userSettings.objects.filter(profileId=baseUserData)):
 			user=userSettings.objects.get(profileId=profile)
 			user.delete()
 			user=userSettings(profileId=baseUser.objects.get(profileId=profile),rollNumber=post['rollNumber'],department=post['department'])
 			user.save()
-			for i in range (0,7):
-				if(post['selectedCategory']==str(i)):
-					categoryData=Category.objects.get(id=i)
-					form=userCategory(userId=baseUserData,categoryId=categoryData)
-					instance = form.save(commit=False)
-					instance.pk=None
-					instance.save()
+			for i in range (0,len(selected['selectedCategory'])):
+				categoryData=Category.objects.get(id=selected['selectedCategory'][i])
+				form=userCategory(userId=baseUserData,categoryId=categoryData)
+				form.save()
+				#instance = form.save(commit=False)
+				#instance.pk=None
+				#instance.save()
 			return redirect('/user.html')
 		else:
 			user=userSettings(profileId=baseUser.objects.get(profileId=profile),rollNumber=post['rollNumber'],department=post['department'])
 			user.save()
-			for i in range (0,7):
-				if(post['selectedCategory']==str(i)):
-					categoryData=Category.objects.get(id=i)
-					form=userCategory(userId=baseUserData,categoryId=categoryData)
-					instance = form.save(commit=False)
-					instance.pk=None
-					instance.save()
+			for i in range (0,len(selected['selectedCategory'])):
+				categoryData=Category.objects.get(id=i)
+				form=userCategory(userId=baseUserData,categoryId=categoryData)
+				form.save()
 			return redirect('/user.html')
 	elif(baseUserData.userType=="publisher"):
 		if(publisherSettings.objects.filter(profileId=baseUserData)):

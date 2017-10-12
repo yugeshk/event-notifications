@@ -48,7 +48,7 @@
 			You would like to be notified about which of the following? : <br>
 			<br><br>
 			<div class="categories" ng-repeat="categories in category">
-				<input type="checkbox" id="check" name="selectedCategory" value={{categories.pk}}>
+				<input type="checkbox" id="check" name="selectedCategory" ng-value="categories.pk">
 				<label for="check">{{categories.fields.name}}</label>
 			</div>
 			<input type="submit" value ="Submit">
