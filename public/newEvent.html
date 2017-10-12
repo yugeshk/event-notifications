@@ -1,30 +1,44 @@
 <!DOCTYPE html>
 <html>
 <head>
-	<title>Create a New Event</title>
-	<!-- Bootstrap -->
-	<link rel="stylesheet" type="text/css" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+    <title>Create a New Event</title>
+    <!-- Bootstrap -->
+    <link rel="stylesheet" type="text/css" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+    <link rel="stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/jqueryui/1.12.1/jquery-ui.min.css">
+    <link rel="stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/jquery-ui-timepicker-addon/1.6.3/jquery-ui-timepicker-addon.min.css">
 </head>
 <body>
-	<div class="container">
-		<h1> Invite People for an Event you're organizing</h1>
-		<form action="/user/newEvent" method="post">
-			Event Name : <input type="text" name="eventName" placeholder="eg. Lecture/Workshop on xyz" required style="width: 300px">
-			<br><br>
-			Event Type : <input type="text" name="eventType" required>
-			<br><br>
-			Date : <input type="date" name="eventDate" required>
-			Start Time : <input type="time" name="startTime" required>
-			End Time : <input type="time" name="endTime" required>
-			<br><br>
-			Location : <input type="text" name="location" required placeholder="eg. OAT or NSAC">
-			<br><br>
-			Link/Url (if available) : <input type="url" name="eventPage">
-			<br><br>
-			Description : <input type="text" name="description" style="height: 500px; width:500px; font-size: 14px">
-			<br><br>
-			<input type="submit" value="Submit">
-		</form>
-	</div>
+    <div class="container">
+        <h1> Invite People for an Event you're organizing</h1>
+        <form action="/user/newEvent" method="post">
+            Event Name : <input type="text" name="eventName" placeholder="eg. Lecture/Workshop on xyz" required style="width: 300px">
+            <br><br>
+            Event Type : <input type="text" name="eventType" required>
+            <br><br>
+            Start Date : <input id="datepicker" type="date" name="startDate" required>
+            Start Time : <input id="timePicker1" type="time" name="startTime" required>
+            <br><br>
+            End Date : <input id="datepicker" type="date" name="endDate">
+            End Time : <input id="timePicker2" type="time" name="endTime" required>
+            <br><br>
+            Location : <input type="text" name="location" required placeholder="eg. OAT or NSAC">
+            <br><br>
+            Link/Url (if available) : <input type="url" name="eventPage">
+            <br><br>
+            Description : <input type="text" name="description" style="height: 500px; width:500px; font-size: 14px">
+            <br><br>
+            <input type="submit" value="Submit">
+        </form>
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+        <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jqueryui/1.12.1/jquery-ui.min.js"></script>
+        <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jquery-ui-timepicker-addon/1.6.3/jquery-ui-timepicker-addon.min.js"></script>
+        <script type="text/javascript">
+            // Timpicker plugin docs http://trentrichardson.com/examples/timepicker/
+            // Datepicker plugin docs https://jqueryui.com/datepicker/
+            $('#datepicker').datepicker();
+            $('#timePicker1').timepicker();
+            $('#timePicker2').timepicker();
+        </script>
+    </div>
 </body>
 </html>

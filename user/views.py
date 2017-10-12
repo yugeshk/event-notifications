@@ -1,6 +1,6 @@
 from django.shortcuts import render, redirect
 from django.http import HttpResponse, JsonResponse
-from user.models import baseUser, userSettings, publisherSettings
+from user.models import baseUser, userSettings, publisherSettings, Event
 from django.views.decorators.csrf import csrf_exempt
 from django import forms
 import json
@@ -21,13 +21,22 @@ def login(request):
 		user = baseUser(name=post['name'], email=post['email'], profileId=post['profileId'], imageUrl=post['imageUrl'])
 		user.save()
 		request.session['profileId'] = user.profileId
+		request.session['isVerifiedPublisher']='false'
 		print(request.session['profileId'])
 		return JsonResponse({ 'url': '/signUp.html'})
 	else:
 		# Old User
 		request.session['profileId'] = query.first().profileId
 		print(request.session['profileId'])
-		return JsonResponse({ 'url': '/user.html'})
+		if(query.first().userType=='user'):
+			return JsonResponse({ 'url': '/user.html'})
+		elif(query.first().userType=='publisher'):
+			request.session['isVerifiedPublisher']=publisherSettings.objects.get(profileId=request.session['profileId']).verifiedPublisher
+			if(request.session['isVerifiedPublisher']=='true'):
+				return JsonResponse({'url' : '/publisher.html'})
+			else:
+				return JsonResponse({'url':'/publisherVerification.html'})
+		return HttpResponse(status=500)
 
 @csrf_exempt
 def signUp(request):
@@ -51,7 +60,6 @@ def signUp(request):
 def logout(request):
 	if(request.method != 'POST'):
 		return redirect('/index.html')
-	
 	request.session.flush()
 	return JsonResponse({ 'url': '/index.html'})		
 
@@ -61,6 +69,23 @@ def isLoggedIn(request):
 		return HttpResponse(status=200)
 	else:
 		return HttpResponse(status=500)
+@csrf_exempt
+def newEvent(request):
+	if(request.method!='POST'):
+		return redirect('/index.html')
+	post=request.POST
+	profile=request.session['profileId']
+	authenticated=request.session['isVerifiedPublisher']
+	user=baseUser.objects.get(profileId=profile)
+	if(authenticated=='true'):
+		#Using Start Time end Time. see format of Django
+		eventData= Event(name=post['eventName'], location=post['location'],description=post['description'], url=post['eventPage'], profileId=user)
+		eventData.save()
+		return redirect('/publisher.html')
+	elif(authenticated=='false'):
+		return request('/publisherVerification.html')
+	return HttpResponse(status=500)
+
 
 def getCategories(request):
 	# Identify user using request.session['profileId']

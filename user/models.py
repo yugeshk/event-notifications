@@ -30,18 +30,19 @@ class publisherSettings(models.Model):
 	contactNumber =models.CharField(max_length=10, default='')
 
 	def __str__(self):
-		return self.profileId + '-' + self.displayName + '-' + self.website + '-' + self.contentType
+		return self.profileId.profileId + '-' + self.displayName + '-' + self.website + '-' + self.contentType
 
 class Event(models.Model):
-	name 			= models.CharField(max_length=200)
-	start_time 		= models.DateTimeField()
-	end_time 		= models.DateTimeField() 
-	location 		= models.CharField(max_length=200)
-	description 	= models.CharField(max_length=500)
-	publisher_id 	= models.CharField(max_length=200)
+	name 			= models.CharField(max_length=200,default='')
+	start_time 		= models.DateTimeField(default='1999-05-31 12:00')
+	end_time 		= models.DateTimeField(default='1999-05-31 12:00') 
+	location 		= models.CharField(max_length=200,default='')
+	description 	= models.CharField(max_length=500, default='')
+	url				= models.CharField(max_length=100, default='')
+	profileId	 	= models.ForeignKey(baseUser, on_delete=models.CASCADE, default='')
 
 	def __str__(self):
-		return self.name + '-' +self.time + '-' + self.location + '-' + self.description + '-' +self.publisher_id
+		return self.name + '-' +self.url + '-' + self.location + '-' + self.description + '-' +self.profileId.profileId
 
 class Category(models.Model):
 	name 		= models.CharField(max_length=200)
