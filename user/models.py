@@ -19,7 +19,7 @@ class userSettings(models.Model):
 	department	=models.CharField(max_length=50)
 
 	def __str__(self):
-		return self.profileId + '-' + self.rollNumber + '-' + self.department
+		return self.profileId.profileId + '-' + self.rollNumber + '-' + self.department
 
 class publisherSettings(models.Model):
 	profileId	= models.ForeignKey(baseUser, on_delete=models.CASCADE)
@@ -32,21 +32,20 @@ class publisherSettings(models.Model):
 	def __str__(self):
 		return self.profileId.profileId + '-' + self.displayName + '-' + self.website + '-' + self.contentType
 
+class Category(models.Model):
+	id 			= models.CharField(max_length=2, primary_key=True, default='')
 class Event(models.Model):
-	name 			= models.CharField(max_length=200,default='')
+	name 			= models.CharField(max_length=200)
+	categoryId		= models.ForeignKey(Category, on_delete=models.CASCADE)
 	start_time 		= models.DateTimeField(default='1999-05-31 12:00')
 	end_time 		= models.DateTimeField(default='1999-05-31 12:00') 
-	location 		= models.CharField(max_length=200,default='')
-	description 	= models.CharField(max_length=500, default='')
-	url				= models.CharField(max_length=100, default='')
-	profileId	 	= models.ForeignKey(baseUser, on_delete=models.CASCADE, default='')
+	location 		= models.CharField(max_length=200)
+	description 	= models.CharField(max_length=500)
+	url				= models.CharField(max_length=100)
+	profileId	 	= models.ForeignKey(baseUser, on_delete=models.CASCADE)
 
 	def __str__(self):
 		return self.name + '-' +self.url + '-' + self.location + '-' + self.description + '-' +self.profileId.profileId
-
-class Category(models.Model):
-	id 			= models.CharField(max_length=2,primary_key=True,default='')
-	name 		= models.CharField(max_length=200)
 
 class userCategory(models.Model):
 	userId 		= models.ForeignKey(baseUser, on_delete=models.CASCADE)

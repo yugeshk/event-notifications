@@ -2,10 +2,36 @@
 <html>
 <head>
 	<title>Pubisher Verification</title>
+	<meta name="google-signin-client_id" content="403176586402-2573bsbcg6ltedsgra1s5lgs5065mbuk.apps.googleusercontent.com">
 </head>
 <body>
 	<h1>This is the publisher Verification page</h1>
 	<h2> Please drop a mail to <strong>admin@iitk.ac.in</strong> for considering your sign up</h2>
 	<h2> Login again to see if you've been approved.</h2>
+	<div>
+		<a href="#" onclick="signOut();">Sign out</a>
+	</div>
+	<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+	<script src="https://apis.google.com/js/platform.js?onload=onLoad" async defer></script>
+	<script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.6.4/angular.min.js"></script>
+	<script>
+		function signOut() {
+			var auth2 = gapi.auth2.getAuthInstance();
+			auth2.signOut().then(function reportSignOut() {
+				console.log('User signed out.');
+				$.post('/user/logout', {}, function(response) {
+					window.location = response.url;
+				})
+			}, function reportCouldNotSignOut() {
+				console.log('Could Not Sign Out');
+			});
+		}
+
+		function onLoad() {
+      		gapi.load('auth2', function() {
+        		gapi.auth2.init();
+      		});
+    	}
+	</script>
 </body>
 </html>

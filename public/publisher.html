@@ -2,18 +2,74 @@
 <html>
 <head>
 	<title>Publisher Home Page</title>
+	<script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.6.6/angular.min.js"></script>
 	<!-- Bootstrap -->
 	<link rel="stylesheet" type="text/css" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+	<link rel="stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/jquery-ui-timepicker-addon/1.6.3/jquery-ui-timepicker-addon.min.css">
+	<meta name="google-signin-client_id" content="403176586402-2573bsbcg6ltedsgra1s5lgs5065mbuk.apps.googleusercontent.com">
+	<script src="http://code.jquery.com/jquery-1.11.0.min.js"></script>
 </head>
-<body>
+<body ng-app="Events" ng-controller="EventsController">
 	<div class="container">
 		<h1>This is the publisher home page</h1>
 		<button onclick="create();">Create New Events</button>
+		<h1> Your Upcoming Events:</h1>
+		<div class="col-md-9">
+			<div class="event" ng-repeat="event in events" style="background-color: #f0f0ea; padding: 20px;border-radius: 10px; margin: 5px;">
+				<h3> {{event.fields.name}} @ {{event.fields.location}}</h3>
+				<p> {{event.fields.start_time | date: ' HH:mm dd/MM/yyyy '}} to {{event.fields.end_time | date: ' HH:mm dd/MM/yyyy '}} </p>
+				<p> Relevant Url : {{event.fields.url}}</p>
+				<p> {{event.fields.description}} </p>
+			</div>
+		</div>
+		<div>
+			<a href="#" onclick="signOut();">Sign out</a>
+		</div>
 	</div>
+	<script src="https://apis.google.com/js/platform.js?onload=onLoad" async defer></script>
+	<script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.6.4/angular.min.js"></script>
+	<script>
+		function signOut() {
+			var auth2 = gapi.auth2.getAuthInstance();
+			auth2.signOut().then(function reportSignOut() {
+				console.log('User signed out.');
+				$.post('/user/logout', {}, function(response) {
+					window.location = response.url;
+				})
+			}, function reportCouldNotSignOut() {
+				console.log('Could Not Sign Out');
+			});
+		}
+
+		function onLoad() {
+      		gapi.load('auth2', function() {
+        		gapi.auth2.init();
+      		});
+    	}
+	</script>
 	<script type="text/javascript">
 		function create() {
 			window.location = '/newEvent.html'
 		}
 	</script>
+	<script type="text/javascript">
+			var app= angular.module("Events",[]);
+			app.controller("EventsController",function($scope,$http) {
+
+			$scope.events =[];
+			var getEventsGetOption = {method : 'POST', url :'/user/getEvents'}
+
+			function getEventsSuccessFunction(response) {
+				$scope.events = JSON.parse(response.data.eventsJson);
+				console.log($scope.events)
+			}
+
+			function getEventsFailureFunction(response) {
+				console.log(response)
+			}
+
+			$http(getEventsGetOption).then(getEventsSuccessFunction, getEventsFailureFunction);
+			});
+		</script>
 </body>
 </html>

@@ -1,6 +1,6 @@
 from django.shortcuts import render, redirect
 from django.http import HttpResponse, JsonResponse
-from user.models import baseUser, userSettings, publisherSettings, Event, Category, userCategory
+from user.models import baseUser, userSettings, publisherSettings, Event, Category, userCategory, EventCategory
 from django.views.decorators.csrf import csrf_exempt
 from django import forms
 import json
@@ -70,6 +70,7 @@ def isLoggedIn(request):
 		return HttpResponse(status=200)
 	else:
 		return HttpResponse(status=500)
+
 @csrf_exempt
 def newEvent(request):
 	if(request.method!='POST'):
@@ -78,9 +79,10 @@ def newEvent(request):
 	profile=request.session['profileId']
 	authenticated=request.session['isVerifiedPublisher']
 	user=baseUser.objects.get(profileId=profile)
+	print(post)
 	if(authenticated=='true'):
 		#Using Start Time end Time. see format of Django
-		eventData= Event(name=post['eventName'], location=post['location'],description=post['description'], url=post['eventPage'], profileId=user)
+		eventData= Event(name=post['eventName'], categoryId=Category.objects.get(id=post['selectedCategory']), location=post['location'], description=post['description'], url=post['eventPage'], profileId=user)
 		eventData.save()
 		return redirect('/publisher.html')
 	elif(authenticated=='false'):
@@ -89,6 +91,7 @@ def newEvent(request):
 
 def getAllCategories(request):
 	return HttpResponse(status=500)
+	#No purpose for this function at the moment. Created keeping modularity in view for further working.
 
 def getCategories(request):
 	if(request.method=='GET'):
@@ -109,6 +112,7 @@ def getSettings(request):
 
 #Change the method to edit settings. at the moment it works on delete save
 
+#Use functions to decrease repeatation of code. E.g saveCategories
 @csrf_exempt
 def saveSettings(request):
 	if(request.method != 'POST'):
@@ -117,7 +121,6 @@ def saveSettings(request):
 	profile = request.session['profileId']
 	baseUserData = baseUser.objects.get(profileId=profile)
 	selected = dict(post)
-	#print(post['selectedCategory'][1])
 	if(baseUserData.userType=='user'):
 		if(userSettings.objects.filter(profileId=baseUserData)):
 			user=userSettings.objects.get(profileId=profile)
@@ -128,9 +131,6 @@ def saveSettings(request):
 				categoryData=Category.objects.get(id=selected['selectedCategory'][i])
 				form=userCategory(userId=baseUserData,categoryId=categoryData)
 				form.save()
-				#instance = form.save(commit=False)
-				#instance.pk=None
-				#instance.save()
 			return redirect('/user.html')
 		else:
 			user=userSettings(profileId=baseUser.objects.get(profileId=profile),rollNumber=post['rollNumber'],department=post['department'])
@@ -164,4 +164,18 @@ def saveSettings(request):
 def getEvents(request):
 	# Identify user using request.session['profileId']
 	# Return array of events relevant to that user.
-	return JsonResponse({'data': [{'name': 'Programming Contest','start_time': '1506686400','end_time': '1506688400','location': 'Hall 5, IIT Kanpur','description': 'Online hackathon. 5 member teams.','publishedBy': 'Programming CLub'},{'name': 'Programming Contest','start_time': '1506686400','end_time': '1506688400','location': 'Hall 5, IIT Kanpur','description': 'Online hackathon. 5 member teams.','publishedBy': 'Programming CLub'},{'name': 'Programming Contest','start_time': '1506686400','end_time': '1506688400','location': 'Hall 5, IIT Kanpur','description': 'Online hackathon. 5 member teams.','publishedBy': 'Programming CLub'},{'name': 'Programming Contest','start_time': '1506686400','end_time': '1506688400','location': 'Hall 5, IIT Kanpur','description': 'Online hackathon. 5 member teams.','publishedBy': 'Programming CLub'},{'name': 'Programming Contest','start_time': '1506686400','end_time': '1506688400','location': 'Hall 5, IIT Kanpur','description': 'Online hackathon. 5 member teams.','publishedBy': 'Programming CLub'}]})
+	profile=request.session['profileId']
+	post=request.POST
+	baseUserData=baseUser.objects.get(profileId=profile)
+	if(baseUserData.userType=='publisher'):
+		eventsJson = serializers.serialize("json", Event.objects.filter(profileId=baseUserData))
+		data = {"eventsJson" : eventsJson}
+		print(data)
+		return JsonResponse(data)
+	elif(baseUserData.userType=='user'):
+		userCategoryData=userCategory.objects.filter(userId=baseUserData)
+		print(userCategoryData)
+		eventsJson = serializers.serialize("json", Event.objects.filter(profileId=baseUserData))
+		data = {"eventsJson" : eventsJson}
+		#return JsonResponse(data)
+		return JsonResponse({'data': [{'name': 'Programming Contest','start_time': '1506686400','end_time': '1506688400','location': 'Hall 5, IIT Kanpur','description': 'Online hackathon. 5 member teams.','publishedBy': 'Programming CLub'},{'name': 'Programming Contest','start_time': '1506686400','end_time': '1506688400','location': 'Hall 5, IIT Kanpur','description': 'Online hackathon. 5 member teams.','publishedBy': 'Programming CLub'},{'name': 'Programming Contest','start_time': '1506686400','end_time': '1506688400','location': 'Hall 5, IIT Kanpur','description': 'Online hackathon. 5 member teams.','publishedBy': 'Programming CLub'},{'name': 'Programming Contest','start_time': '1506686400','end_time': '1506688400','location': 'Hall 5, IIT Kanpur','description': 'Online hackathon. 5 member teams.','publishedBy': 'Programming CLub'},{'name': 'Programming Contest','start_time': '1506686400','end_time': '1506688400','location': 'Hall 5, IIT Kanpur','description': 'Online hackathon. 5 member teams.','publishedBy': 'Programming CLub'}]})

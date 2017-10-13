@@ -32,11 +32,11 @@
 				<p> {{event.publishedBy}} </p>	
 			</div>
 		</div>
+		<div>
+			<a href="#" onclick="signOut();">Sign out</a>
+		</div>
+		<button onclick="editSettings();">Edit Settings</button> 
 	</div>
-	<div>
-		<a href="#" onclick="signOut();">Sign out</a>
-	</div>
-	<button onclick="editSettings();">Edit Settings</button> 
  	<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
 	<script src="https://apis.google.com/js/platform.js?onload=onLoad" async defer></script>
 	<script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.6.4/angular.min.js"></script>
@@ -45,18 +45,13 @@
 		app.controller("EventsController", function($scope, $http) {
 			// Some Initial Value
 			$scope.events = [];
-
 			var getEventsPostOptions = { method: 'POST', url: '/user/getEvents' };
-		
 			function getEventsSuccessFunction(response) {
 				$scope.events = response.data;
 			}
-
 			function getEventsFailureFunction(response) {
 				console.log(response);
 			}
-
-  			
 			$http(getEventsPostOptions).then(getEventsSuccessFunction, getEventsFailureFunction);
 		});
 	</script>
