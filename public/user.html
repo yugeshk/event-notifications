@@ -25,11 +25,11 @@
 	<h1> User Page </h1>
 	<div class="container">
 		<div class="col-md-9">
-			<div class="event" ng-repeat="event in events.data" style="background-color: #f0f0ea; padding: 20px;border-radius: 10px; margin: 5px;">
-				<h3> {{event.name}} @ {{event.location}}</h3>
-				<p> {{event.start_time | date: ' HH:mm dd/MM/yyyy '}} to {{event.end_time | date: ' HH:mm dd/MM/yyyy '}} </p>
-				<p> {{event.description}} </p>
-				<p> {{event.publishedBy}} </p>	
+			<div class="event" ng-repeat="event in events" style="background-color: #f0f0ea; padding: 20px;border-radius: 10px; margin: 5px;">
+				<h3> {{event.fields.name}} @ {{event.fields.location}}</h3>
+				<p> {{event.fields.start_time | date: ' HH:mm dd/MM/yyyy '}} to {{event.fields.end_time | date: ' HH:mm dd/MM/yyyy '}} </p>
+				<p> {{event.fields.description}} </p>
+				<p> {{event.fields.publishedBy}} </p>	
 			</div>
 		</div>
 		<div>
@@ -47,7 +47,7 @@
 			$scope.events = [];
 			var getEventsPostOptions = { method: 'POST', url: '/user/getEvents' };
 			function getEventsSuccessFunction(response) {
-				$scope.events = JSON.parse(response.data);
+				$scope.events = JSON.parse(response.data.eventsJson);
 				console.log($scope.events);
 			}
 			function getEventsFailureFunction(response) {

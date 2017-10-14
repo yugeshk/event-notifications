@@ -137,7 +137,7 @@ def saveSettings(request):
 			user=userSettings(profileId=baseUser.objects.get(profileId=profile),rollNumber=post['rollNumber'],department=post['department'])
 			user.save()
 			for i in range (0,len(selected['selectedCategory'])):
-				categoryData=Category.objects.get(id=str(i))
+				categoryData=Category.objects.get(id=selected['selectedCategory'][i])
 				form=userCategory(userId=baseUserData,categoryId=categoryData)
 				form.save()
 			return redirect('/user.html')
@@ -174,12 +174,14 @@ def getEvents(request):
 		print(data)
 		return JsonResponse(data)
 	elif(baseUserData.userType=='user'):
-		categoryJson = serializers.serialize("json", userCategory.objects.filter(userId=baseUserData))
-		categoryData = {"categoryJson" : categoryJson}
-		print(categoryData)
-		userCategoryData=Category.objects.filter(id__in=categoryDatafields.categoryId)
-		print(userCategoryData)
-		eventsJson = serializers.serialize("json", Event.objects.filter(categoryId__in=userCategoryData))
+		#categoryJson = serializers.serialize("json", userCategory.objects.filter(userId=baseUserData))
+		#categoryData = {"categoryJson" : categoryJson}
+		#print(categoryData)
+		#userCategoryData=Category.objects.filter(id__in=categoryDatafields.categoryId)
+		#print(userCategoryData)
+		eventData = Event.objects.raw('SELECT * FROM user_event INNER JOIN user_usercategory ON user_event.categoryId_id=user_usercategory.categoryId_id AND user_usercategory.userId_id='+'"'+request.session['profileId']+'"')
+		print(eventData)
+		eventsJson = serializers.serialize("json", eventData)
 		data = {"eventsJson" : eventsJson}
 		print(data)
 		return JsonResponse(data)
