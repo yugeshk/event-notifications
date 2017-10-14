@@ -56,19 +56,15 @@
 		<script type="text/javascript">
 			var app= angular.module("Category",[]);
 			app.controller("CategoryController",function($scope,$http) {
-
 			$scope.category =[];
 			var getCaterogyGetOption = {method : 'GET', url :'/user/getCategories'}
-
 			function getCategoriesSuccessFunction(response) {
 				$scope.category = JSON.parse(response.data.categoryJson);
 				console.log($scope.category)
 			}
-
 			function getCategoriesFailureFunction(response) {
 				console.log(response)
 			}
-
 			$http(getCaterogyGetOption).then(getCategoriesSuccessFunction, getCategoriesFailureFunction);
 			});
 		</script>		

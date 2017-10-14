@@ -47,7 +47,8 @@
 			$scope.events = [];
 			var getEventsPostOptions = { method: 'POST', url: '/user/getEvents' };
 			function getEventsSuccessFunction(response) {
-				$scope.events = response.data;
+				$scope.events = JSON.parse(response.data);
+				console.log($scope.events);
 			}
 			function getEventsFailureFunction(response) {
 				console.log(response);

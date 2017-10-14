@@ -55,19 +55,15 @@
 	<script type="text/javascript">
 			var app= angular.module("Events",[]);
 			app.controller("EventsController",function($scope,$http) {
-
 			$scope.events =[];
 			var getEventsGetOption = {method : 'POST', url :'/user/getEvents'}
-
 			function getEventsSuccessFunction(response) {
 				$scope.events = JSON.parse(response.data.eventsJson);
 				console.log($scope.events)
 			}
-
 			function getEventsFailureFunction(response) {
 				console.log(response)
 			}
-
 			$http(getEventsGetOption).then(getEventsSuccessFunction, getEventsFailureFunction);
 			});
 		</script>

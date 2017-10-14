@@ -97,12 +97,12 @@ def getCategories(request):
 	if(request.method=='GET'):
 		categoryJson = serializers.serialize("json", Category.objects.all())
 		data = {"categoryJson" : categoryJson}
-		#print(data)
+		print(data)
 		return JsonResponse(data)
 	# Identify user using request.session['profileId']
 	# Return array of all categories having boolean to show if user is interested or not.
 	# eg Response [{ name: 'Coding', interested: true }, { name: 'Robotics', interested: false }]
-	return HttpResponse("Hello World. You're at the poll index. GETCATEGORIES")
+	#return HttpResponse("Hello World. You're at the poll index. GETCATEGORIES")
 def saveCategories(request):
 	# Identify user using request.session['profileId']
 	# Accept data in this format Response [{ name: 'Coding', interested: true }, { name: 'Robotics', interested: false }]
@@ -121,6 +121,7 @@ def saveSettings(request):
 	profile = request.session['profileId']
 	baseUserData = baseUser.objects.get(profileId=profile)
 	selected = dict(post)
+	print(selected)
 	if(baseUserData.userType=='user'):
 		if(userSettings.objects.filter(profileId=baseUserData)):
 			user=userSettings.objects.get(profileId=profile)
@@ -136,7 +137,7 @@ def saveSettings(request):
 			user=userSettings(profileId=baseUser.objects.get(profileId=profile),rollNumber=post['rollNumber'],department=post['department'])
 			user.save()
 			for i in range (0,len(selected['selectedCategory'])):
-				categoryData=Category.objects.get(id=i)
+				categoryData=Category.objects.get(id=str(i))
 				form=userCategory(userId=baseUserData,categoryId=categoryData)
 				form.save()
 			return redirect('/user.html')
@@ -173,9 +174,17 @@ def getEvents(request):
 		print(data)
 		return JsonResponse(data)
 	elif(baseUserData.userType=='user'):
-		userCategoryData=userCategory.objects.filter(userId=baseUserData)
+		categoryJson = serializers.serialize("json", userCategory.objects.filter(userId=baseUserData))
+		categoryData = {"categoryJson" : categoryJson}
+		print(categoryData)
+		userCategoryData=Category.objects.filter(id__in=categoryDatafields.categoryId)
 		print(userCategoryData)
-		eventsJson = serializers.serialize("json", Event.objects.filter(profileId=baseUserData))
+		eventsJson = serializers.serialize("json", Event.objects.filter(categoryId__in=userCategoryData))
 		data = {"eventsJson" : eventsJson}
-		#return JsonResponse(data)
-		return JsonResponse({'data': [{'name': 'Programming Contest','start_time': '1506686400','end_time': '1506688400','location': 'Hall 5, IIT Kanpur','description': 'Online hackathon. 5 member teams.','publishedBy': 'Programming CLub'},{'name': 'Programming Contest','start_time': '1506686400','end_time': '1506688400','location': 'Hall 5, IIT Kanpur','description': 'Online hackathon. 5 member teams.','publishedBy': 'Programming CLub'},{'name': 'Programming Contest','start_time': '1506686400','end_time': '1506688400','location': 'Hall 5, IIT Kanpur','description': 'Online hackathon. 5 member teams.','publishedBy': 'Programming CLub'},{'name': 'Programming Contest','start_time': '1506686400','end_time': '1506688400','location': 'Hall 5, IIT Kanpur','description': 'Online hackathon. 5 member teams.','publishedBy': 'Programming CLub'},{'name': 'Programming Contest','start_time': '1506686400','end_time': '1506688400','location': 'Hall 5, IIT Kanpur','description': 'Online hackathon. 5 member teams.','publishedBy': 'Programming CLub'}]})
+		print(data)
+		return JsonResponse(data)
+		#return JsonResponse({'data': [{'name': 'Programming Contest','start_time': '1506686400','end_time': '1506688400','location': 'Hall 5, IIT Kanpur','description': 'Online hackathon. 5 member teams.','publishedBy': 'Programming CLub'},{'name': 'Programming Contest','start_time': '1506686400','end_time': '1506688400','location': 'Hall 5, IIT Kanpur','description': 'Online hackathon. 5 member teams.','publishedBy': 'Programming CLub'},{'name': 'Programming Contest','start_time': '1506686400','end_time': '1506688400','location': 'Hall 5, IIT Kanpur','description': 'Online hackathon. 5 member teams.','publishedBy': 'Programming CLub'},{'name': 'Programming Contest','start_time': '1506686400','end_time': '1506688400','location': 'Hall 5, IIT Kanpur','description': 'Online hackathon. 5 member teams.','publishedBy': 'Programming CLub'},{'name': 'Programming Contest','start_time': '1506686400','end_time': '1506688400','location': 'Hall 5, IIT Kanpur','description': 'Online hackathon. 5 member teams.','publishedBy': 'Programming CLub'}]})
+
+
+#Edits in the future
+#Only certain fields can be serialized
