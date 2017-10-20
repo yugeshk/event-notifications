@@ -1,6 +1,8 @@
 <!DOCTYPE html>
 <html>
 <head>
+	<meta charset="utf-8">
+  	<meta name="viewport" content="width=device-width, initial-scale=1">
 	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
 	<script type="text/javascript">
 		$.ajax({
@@ -18,12 +20,27 @@
 	<title> User Page </title>
 	<!-- Bootstrap -->
 	<link rel="stylesheet" type="text/css" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+	<!-- Google Client Information-->
 	<meta name="google-signin-client_id" content="403176586402-2573bsbcg6ltedsgra1s5lgs5065mbuk.apps.googleusercontent.com">
 
 </head>
 <body ng-app="Events" ng-controller="EventsController">
-	<h1> User Page </h1>
-	<div class="container">
+	<nav class="navbar navbar-inverse navbar-fixed-top">
+  		<div class="container-fluid">
+    		<div class="navbar-header">
+      			<a class="navbar-brand" href="#">Calendar</a>
+    		</div>
+    		<ul class="nav navbar-nav">
+      			<li class="active" style="font-size: 16px"><a href="/user.html">Events</a></li>
+    		</ul>
+    		<ul class="nav navbar-nav navbar-right">
+    			<p style= "padding-right: 10px; font-size: 16px" class="navbar-text">Name | Roll Number | Department</p>
+      			<li><a href="#" onclick="editSettings();"><span class="glyphicon glyphicon-user"></span> Settings</a></li>
+      			<li><a href="#" onclick="signOut();"><span class="glyphicon glyphicon-log-in"></span> Sign Out</a></li>
+    		</ul>
+  		</div>
+	</nav>
+	<div class="container" style="padding-top: 80px">
 		<div class="col-md-9">
 			<div class="event" ng-repeat="event in events" style="background-color: #f0f0ea; padding: 20px;border-radius: 10px; margin: 5px;">
 				<h3> {{event.fields.name}} @ {{event.fields.location}}</h3>
@@ -31,13 +48,8 @@
 				<p> {{event.fields.description}} </p>
 				<p> {{event.fields.publishedBy}} </p>	
 			</div>
-		</div>
-		<div>
-			<a href="#" onclick="signOut();">Sign out</a>
-		</div>
-		<button onclick="editSettings();">Edit Settings</button> 
+		</div> 
 	</div>
- 	<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
 	<script src="https://apis.google.com/js/platform.js?onload=onLoad" async defer></script>
 	<script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.6.4/angular.min.js"></script>
 	<script type="text/javascript">

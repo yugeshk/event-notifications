@@ -18,15 +18,31 @@
 	<title>User Settings</title>
 	<!-- Bootstrap -->
 	<link rel="stylesheet" type="text/css" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+	<meta name="google-signin-client_id" content="403176586402-2573bsbcg6ltedsgra1s5lgs5065mbuk.apps.googleusercontent.com">
 </head>
-<body ng-app="Category" ng-controller="CategoryController" >
+<nav class="navbar navbar-inverse navbar-fixed-top">
+  		<div class="container-fluid">
+    		<div class="navbar-header">
+      			<a class="navbar-brand" href="#">Calendar</a>
+    		</div>
+    		<ul class="nav navbar-nav">
+      			<li class="active" style="font-size: 16px"><a href="/user.html">Events</a></li>
+    		</ul>
+    		<ul class="nav navbar-nav navbar-right">
+    			<p style= "padding-right: 10px; font-size: 16px" class="navbar-text">Name | Roll Number | Department</p>
+      			<li><a href="#" onclick="editSettings();"><span class="glyphicon glyphicon-user"></span> Settings</a></li>
+      			<li><a href="#" onclick="signOut();"><span class="glyphicon glyphicon-log-in"></span> Sign Out</a></li>
+    		</ul>
+  		</div>
+	</nav>
+<body ng-app="Category" ng-controller="CategoryController" style="padding-top: 80px" >
 	<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
 	<script src="https://apis.google.com/js/platform.js" async defer></script>
 	<script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.6.4/angular.min.js"></script>
 	<div class="container">
 		<h1> User Settings </h1>
 		<form method="post" action="/user/saveSettings">
-			Roll Number : <input type="text" name="rollNumber" required pattern="[0-9]{6}" title="6 digit IITK Roll Number" placeholder="eg. 170830">
+			Roll Number : <input type="text" name="rollNumber" required pattern="[0-9]{6}" title="6 digit IITK Roll Number" value="" placeholder="eg. 170830">
 			<br><br>
 			Department : <select name="department">
 				<option value="Aerospace Engineering">Aerospace Engineering</option>
@@ -45,7 +61,7 @@
 				<option value="BS Economics">BS Economics</option>
 			</select>
 			<br><br>
-			You would like to be notified about which of the following? : <br>
+			You would like to be notified about which of the following? <br>
 			<br><br>
 			<div class="categories" ng-repeat="categories in category">
 				<input type="checkbox" id="check" name="selectedCategory" ng-value="categories.pk">
@@ -53,6 +69,8 @@
 			</div>
 			<input type="submit" value ="Submit">
 		</form>
+		<script src="https://apis.google.com/js/platform.js?onload=onLoad" async defer></script>
+		<script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.6.4/angular.min.js"></script>
 		<script type="text/javascript">
 			var app= angular.module("Category",[]);
 			app.controller("CategoryController",function($scope,$http) {
@@ -67,7 +85,30 @@
 			}
 			$http(getCaterogyGetOption).then(getCategoriesSuccessFunction, getCategoriesFailureFunction);
 			});
-		</script>		
+		</script>
+		<script type="text/javascript"> 
+		function editSettings() {
+			window.location = '/userSettings.html';
+		}
+		</script>
+		<script>
+			function signOut() {
+				var auth2 = gapi.auth2.getAuthInstance();
+				auth2.signOut().then(function reportSignOut() {
+					console.log('User signed out.');
+					$.post('/user/logout', {}, function(response) {
+					window.location = response.url;
+				})
+			}, function reportCouldNotSignOut() {
+				console.log('Could Not Sign Out');
+			});
+		}
+		function onLoad() {
+      		gapi.load('auth2', function() {
+        		gapi.auth2.init();
+      		});
+    	}
+	</script>
 	</div>
 </body>
 </html>
