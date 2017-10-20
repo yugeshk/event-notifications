@@ -6,6 +6,10 @@ from django import forms
 import json
 from django.core import serializers
 
+# Importing Google Libraries
+import google.oauth2.credentials
+import google_auth_oauthlib.flow
+
 # Create your views here.
 
 @csrf_exempt
@@ -24,7 +28,10 @@ def login(request):
 		request.session['profileId'] = user.profileId
 		request.session['isVerifiedPublisher']='false'
 		print(request.session['profileId'])
-		return JsonResponse({ 'url': '/signUp.html'})
+		flow = google_auth_oauthlib.flow.Flow.from_client_secrets_file('client_secret.json', scopes=['https://www.googleapis.com/auth/calendar'])
+		flow.redirect_uri = 'http://localhost:8000/signUp.html'
+		authorization_url, state = flow.authorization_url(access_type='offline',include_granted_scopes='true')
+		return JsonResponse({ 'url': authorization_url})
 	else:
 		# Old User
 		request.session['profileId'] = query.first().profileId
@@ -38,6 +45,8 @@ def login(request):
 			else:
 				return JsonResponse({'url':'/publisherVerification.html'})
 		return HttpResponse(status=500)
+
+
 
 @csrf_exempt
 def signUp(request):
