@@ -9,6 +9,7 @@ from django.core import serializers
 # Importing Google Libraries
 import google.oauth2.credentials
 import google_auth_oauthlib.flow
+from googleapiclient.discovery import build
 
 # Create your views here.
 
@@ -29,8 +30,9 @@ def login(request):
 		request.session['isVerifiedPublisher']='false'
 		print(request.session['profileId'])
 		flow = google_auth_oauthlib.flow.Flow.from_client_secrets_file('client_secret.json', scopes=['https://www.googleapis.com/auth/calendar'])
-		flow.redirect_uri = 'http://localhost:8000/signUp.html'
-		authorization_url, state = flow.authorization_url(access_type='offline',include_granted_scopes='true')
+		flow.redirect_uri = 'http://localhost:8000/user/handleGoogleResponse'
+		authorization_url, state = flow.authorization_url(access_type='offline',include_granted_scopes='true',state='yugesh')
+		request.session['state'] = state
 		return JsonResponse({ 'url': authorization_url})
 	else:
 		# Old User
@@ -45,7 +47,6 @@ def login(request):
 			else:
 				return JsonResponse({'url':'/publisherVerification.html'})
 		return HttpResponse(status=500)
-
 
 
 @csrf_exempt
@@ -82,20 +83,64 @@ def isLoggedIn(request):
 
 @csrf_exempt
 def newEvent(request):
-	if(request.method!='POST'):
-		return redirect('/index.html')
-	post=request.POST
-	profile=request.session['profileId']
-	authenticated=request.session['isVerifiedPublisher']
-	user=baseUser.objects.get(profileId=profile)
-	print(post)
-	if(authenticated=='true'):
-		#Using Start Time end Time. see format of Django
-		eventData= Event(name=post['eventName'], categoryId=Category.objects.get(id=post['selectedCategory']), location=post['location'], description=post['description'], url=post['eventPage'], profileId=user)
-		eventData.save()
-		return redirect('/publisher.html')
-	elif(authenticated=='false'):
-		return request('/publisherVerification.html')
+	# if(request.method!='POST'):
+	# 	return redirect('/index.html')
+	# post=request.POST
+	# profile=request.session['profileId']
+	# authenticated=request.session['isVerifiedPublisher']
+	# user=baseUser.objects.get(profileId=profile)
+	# print(post)
+	# if(authenticated=='true'):
+	# 	#Using Start Time end Time. see format of Django
+	# 	eventData= Event(name=post['eventName'], categoryId=Category.objects.get(id=post['selectedCategory']), location=post['location'], description=post['description'], url=post['eventPage'], profileId=user)
+	# 	eventData.save()
+	# 	return redirect('/publisher.html')
+	# elif(authenticated=='false'):
+	# 	return request('/publisherVerification.html')
+
+	#Google Api Code
+	state = 'yugesh'
+	flow = google_auth_oauthlib.flow.Flow.from_client_secrets_file('client_secret.json',scopes=['https://www.googleapis.com/auth/calendar'],state=state)
+	flow.redirect_uri = 'http://localhost:8000/user/handleGoogleResponse'
+	flow.fetch_token(code='4/pOT7BRCD1UDaL_Lhyphd3S4kaSH4eSbRj4pVOkoiA5A')
+	
+	# print('token'+ flow.credentials.token)
+	# print('refresh_token'+ flow.credentials.refresh_token)
+	# print('token_uri'+ flow.credentials.token_uri)
+	# print('client_id'+ flow.credentials.client_id)
+	# print('client_secret'+ flow.credentials.client_secret)
+	# print('scopes'+ flow.credentials.scopes)
+	
+	print('Received token!')
+	
+	service = build('calendar', 'v3', credentials=flow.credentials)
+	event = {
+		'summary': 'Google I/O 2015',
+		'location': '800 Howard St., San Francisco, CA 94103',
+		'description': 'A chance to hear more about Google\'s developer products.',
+		'start': {
+			'dateTime': '2017-10-28T09:00:00-07:00',
+			'timeZone': 'America/Los_Angeles',
+		},
+		'end': {
+			'dateTime': '2017-10-29T17:00:00-07:00',
+			'timeZone': 'America/Los_Angeles',
+		},
+		'reminders': {
+			'useDefault': False,
+			'overrides': [
+				{'method': 'email', 'minutes': 24 * 60},
+				{'method': 'popup', 'minutes': 10},
+			],
+		},
+	}
+
+	event = service.events().insert(calendarId='primary', body=event).execute()
+	print('Event created: %s' % (event.get('htmlLink')))
+
+
+
+
 	return HttpResponse(status=500)
 
 def getAllCategories(request):
@@ -195,6 +240,12 @@ def getEvents(request):
 		print(data)
 		return JsonResponse(data)
 		#return JsonResponse({'data': [{'name': 'Programming Contest','start_time': '1506686400','end_time': '1506688400','location': 'Hall 5, IIT Kanpur','description': 'Online hackathon. 5 member teams.','publishedBy': 'Programming CLub'},{'name': 'Programming Contest','start_time': '1506686400','end_time': '1506688400','location': 'Hall 5, IIT Kanpur','description': 'Online hackathon. 5 member teams.','publishedBy': 'Programming CLub'},{'name': 'Programming Contest','start_time': '1506686400','end_time': '1506688400','location': 'Hall 5, IIT Kanpur','description': 'Online hackathon. 5 member teams.','publishedBy': 'Programming CLub'},{'name': 'Programming Contest','start_time': '1506686400','end_time': '1506688400','location': 'Hall 5, IIT Kanpur','description': 'Online hackathon. 5 member teams.','publishedBy': 'Programming CLub'},{'name': 'Programming Contest','start_time': '1506686400','end_time': '1506688400','location': 'Hall 5, IIT Kanpur','description': 'Online hackathon. 5 member teams.','publishedBy': 'Programming CLub'}]})
+
+@csrf_exempt
+def handleGoogleResponse(request):
+	print(request.GET['code'])
+	print(request.GET['state'])
+	return redirect('/signUp.html')
 
 
 #Edits in the future

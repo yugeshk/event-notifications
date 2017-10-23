@@ -11,5 +11,6 @@ urlpatterns = [
 	url(r'saveSettings', views.saveSettings, name='saveSettings'),
 	url(r'getEvents', views.getEvents, name='getEvents'),
 	url(r'signUp', views.signUp, name='signUp'),
-	url(r'newEvent',views.newEvent, name='newEvent')
+	url(r'newEvent',views.newEvent, name='newEvent'),
+	url(r'handleGoogleResponse', views.handleGoogleResponse, name='handleGoogleResponse')
 ]
