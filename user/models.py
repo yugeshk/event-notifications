@@ -8,8 +8,8 @@ class baseUser(models.Model):
     profileId 	= models.CharField(max_length=200, primary_key=True)
     imageUrl 	= models.CharField(max_length=200)
     userType	= models.CharField(max_length=200)
-
-    
+    googleCode	= models.CharField(max_length=200,default='')
+        
     def __str__(self):
         return self.name + '-' + self.email + '-' + self.profileId + '-' + self.imageUrl
 
@@ -42,8 +42,8 @@ class publisherSettings(models.Model):
 class Event(models.Model):
 	name 			= models.CharField(max_length=200)
 	categoryId		= models.ForeignKey(Category, on_delete=models.CASCADE)
-	start_time 		= models.DateTimeField(default='1999-05-31 12:00')
-	end_time 		= models.DateTimeField(default='1999-05-31 12:00') 
+	start_time 		= models.DateTimeField(default='2017-10-31 12:00')
+	end_time 		= models.DateTimeField(default='2017-10-31 12:00') 
 	location 		= models.CharField(max_length=200)
 	description 	= models.CharField(max_length=500)
 	url				= models.CharField(max_length=100)

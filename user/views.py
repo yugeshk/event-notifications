@@ -83,60 +83,94 @@ def isLoggedIn(request):
 
 @csrf_exempt
 def newEvent(request):
-	# if(request.method!='POST'):
-	# 	return redirect('/index.html')
-	# post=request.POST
-	# profile=request.session['profileId']
-	# authenticated=request.session['isVerifiedPublisher']
-	# user=baseUser.objects.get(profileId=profile)
-	# print(post)
-	# if(authenticated=='true'):
-	# 	#Using Start Time end Time. see format of Django
-	# 	eventData= Event(name=post['eventName'], categoryId=Category.objects.get(id=post['selectedCategory']), location=post['location'], description=post['description'], url=post['eventPage'], profileId=user)
-	# 	eventData.save()
-	# 	return redirect('/publisher.html')
-	# elif(authenticated=='false'):
-	# 	return request('/publisherVerification.html')
+	if(request.method!='POST'):
+		return redirect('/index.html')
+	post=request.POST
+	profile=request.session['profileId']
+	authenticated=request.session['isVerifiedPublisher']
+	user=baseUser.objects.get(profileId=profile)
+	print(post)
+	if(authenticated=='true'):
+		#Using Start Time end Time. see format of Django
+		eventData = Event(name=post['eventName'], categoryId=Category.objects.get(id=post['selectedCategory']), location=post['location'], description=post['description'], url=post['eventPage'], profileId=user)
+		eventData.save()
+		#Calling Google APIs
+		state='yugesh'
+		flow = google_auth_oauthlib.flow.Flow.from_client_secrets_file('client_secret.json',scopes=['https://www.googleapis.com/auth/calendar'],state=state)
+		pushToUsers = userCategory.objects.filter(categoryId=post['selectedCategory']).values('userId')
+		print(pushToUsers)
+		flow.redirect_uri = 'http://localhost:8000/user/handleGoogleResponse'
+		for i in range (0,len(pushToUsers)):
+			userToPush=baseUser.objects.get(profileId=pushToUsers[i]['userId'])
+			flow.fetch_token(code=userToPush.googleCode)
+			userToPush.googleCode=flow.credentials.refresh_token
+			userToPush.save()
+			service = build('calendar', 'v3', credentials=flow.credentials)
+			event = {
+				'summary': post['eventName'],
+				'location': post['location'],
+				'description': post['description'],
+				'start': {
+					'dateTime': '2017-10-28T09:00:00-07:00',
+					'timeZone': 'America/Los_Angeles',
+				},
+				'end': {
+					'dateTime': '2017-10-29T17:00:00-07:00',
+					'timeZone': 'America/Los_Angeles',
+				},
+				'reminders': {
+					'useDefault': False,
+					'overrides': [
+						{'method': 'email', 'minutes': 24 * 60},
+						{'method': 'popup', 'minutes': 10},
+					],
+				},
+			}
+			event = service.events().insert(calendarId='primary', body=event).execute()
+			print('Event created: %s' % (event.get('htmlLink')))
+		return redirect('/publisher.html')
+	elif(authenticated=='false'):
+		return request('/publisherVerification.html')
 
 	#Google Api Code
-	state = 'yugesh'
-	flow = google_auth_oauthlib.flow.Flow.from_client_secrets_file('client_secret.json',scopes=['https://www.googleapis.com/auth/calendar'],state=state)
-	flow.redirect_uri = 'http://localhost:8000/user/handleGoogleResponse'
-	flow.fetch_token(code='4/pOT7BRCD1UDaL_Lhyphd3S4kaSH4eSbRj4pVOkoiA5A')
+	# state = 'yugesh'
+	# flow = google_auth_oauthlib.flow.Flow.from_client_secrets_file('client_secret.json',scopes=['https://www.googleapis.com/auth/calendar'],state=state)
+	# flow.redirect_uri = 'http://localhost:8000/user/handleGoogleResponse'
+	# flow.fetch_token(code='4/pOT7BRCD1UDaL_Lhyphd3S4kaSH4eSbRj4pVOkoiA5A')
 	
-	# print('token'+ flow.credentials.token)
-	# print('refresh_token'+ flow.credentials.refresh_token)
-	# print('token_uri'+ flow.credentials.token_uri)
-	# print('client_id'+ flow.credentials.client_id)
-	# print('client_secret'+ flow.credentials.client_secret)
-	# print('scopes'+ flow.credentials.scopes)
+	# # print('token'+ flow.credentials.token)
+	# # print('refresh_token'+ flow.credentials.refresh_token)
+	# # print('token_uri'+ flow.credentials.token_uri)
+	# # print('client_id'+ flow.credentials.client_id)
+	# # print('client_secret'+ flow.credentials.client_secret)
+	# # print('scopes'+ flow.credentials.scopes)
 	
-	print('Received token!')
+	# print('Received token!')
 	
-	service = build('calendar', 'v3', credentials=flow.credentials)
-	event = {
-		'summary': 'Google I/O 2015',
-		'location': '800 Howard St., San Francisco, CA 94103',
-		'description': 'A chance to hear more about Google\'s developer products.',
-		'start': {
-			'dateTime': '2017-10-28T09:00:00-07:00',
-			'timeZone': 'America/Los_Angeles',
-		},
-		'end': {
-			'dateTime': '2017-10-29T17:00:00-07:00',
-			'timeZone': 'America/Los_Angeles',
-		},
-		'reminders': {
-			'useDefault': False,
-			'overrides': [
-				{'method': 'email', 'minutes': 24 * 60},
-				{'method': 'popup', 'minutes': 10},
-			],
-		},
-	}
+	# service = build('calendar', 'v3', credentials=flow.credentials)
+	# event = {
+	# 	'summary': 'Google I/O 2015',
+	# 	'location': '800 Howard St., San Francisco, CA 94103',
+	# 	'description': 'A chance to hear more about Google\'s developer products.',
+	# 	'start': {
+	# 		'dateTime': '2017-10-28T09:00:00-07:00',
+	# 		'timeZone': 'America/Los_Angeles',
+	# 	},
+	# 	'end': {
+	# 		'dateTime': '2017-10-29T17:00:00-07:00',
+	# 		'timeZone': 'America/Los_Angeles',
+	# 	},
+	# 	'reminders': {
+	# 		'useDefault': False,
+	# 		'overrides': [
+	# 			{'method': 'email', 'minutes': 24 * 60},
+	# 			{'method': 'popup', 'minutes': 10},
+	# 		],
+	# 	},
+	# }
 
-	event = service.events().insert(calendarId='primary', body=event).execute()
-	print('Event created: %s' % (event.get('htmlLink')))
+	# event = service.events().insert(calendarId='primary', body=event).execute()
+	# print('Event created: %s' % (event.get('htmlLink')))
 
 
 
@@ -245,6 +279,10 @@ def getEvents(request):
 def handleGoogleResponse(request):
 	print(request.GET['code'])
 	print(request.GET['state'])
+	profile=request.session['profileId']
+	user=baseUser.objects.get(profileId=profile)
+	user.googleCode=request.GET['code']
+	user.save()
 	return redirect('/signUp.html')
 
 
