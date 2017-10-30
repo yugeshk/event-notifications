@@ -5,13 +5,12 @@ from django.views.decorators.csrf import csrf_exempt
 from django import forms
 import json
 from django.core import serializers
+from datetime import datetime
 
 # Importing Google Libraries
 import google.oauth2.credentials
 import google_auth_oauthlib.flow
 from googleapiclient.discovery import build
-
-# Create your views here.
 
 @csrf_exempt
 def login(request):
@@ -55,8 +54,6 @@ def signUp(request):
 		return redirect('/index.html')
 	post = request.POST
 	profile = request.session['profileId']
-	#user = baseUser(profileId=profile,userType=post['userType'])
-	#user.save()
 	user=baseUser.objects.get(profileId=profile)
 	user.userType=post['userType']
 	user.save()
@@ -92,7 +89,9 @@ def newEvent(request):
 	print(post)
 	if(authenticated=='true'):
 		#Using Start Time end Time. see format of Django
-		eventData = Event(name=post['eventName'], categoryId=Category.objects.get(id=post['selectedCategory']), location=post['location'], description=post['description'], url=post['eventPage'], profileId=user)
+		startTime = datetime.strptime(post['startDate']+' '+post['startTime'],'%m/%d/%Y %H:%M')
+		endTime = datetime.strptime(post['endDate']+' '+post['endTime'],'%m/%d/%Y %H:%M')
+		eventData = Event(name=post['eventName'], categoryId=Category.objects.get(id=post['selectedCategory']), location=post['location'], description=post['description'], url=post['eventPage'], profileId=user, start_time=startTime, end_time=endTime)
 		eventData.save()
 		#Calling Google APIs
 		state='yugesh'
@@ -111,18 +110,18 @@ def newEvent(request):
 				'location': post['location'],
 				'description': post['description'],
 				'start': {
-					'dateTime': '2017-10-28T09:00:00-07:00',
-					'timeZone': 'America/Los_Angeles',
+					'dateTime': startTime.strftime("%Y-%m-%dT%H:%M:00+05:30"),
+					'timeZone': 'Asia/Kolkata',
 				},
 				'end': {
-					'dateTime': '2017-10-29T17:00:00-07:00',
-					'timeZone': 'America/Los_Angeles',
+					'dateTime': endTime.strftime("%Y-%m-%dT%H:%M:00+05:30"),
+					'timeZone': 'Asia/Kolkata',
 				},
 				'reminders': {
 					'useDefault': False,
 					'overrides': [
 						{'method': 'email', 'minutes': 24 * 60},
-						{'method': 'popup', 'minutes': 10},
+						{'method': 'popup', 'minutes': 30},
 					],
 				},
 			}
