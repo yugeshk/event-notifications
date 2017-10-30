@@ -6,11 +6,15 @@ from django import forms
 import json
 from django.core import serializers
 from datetime import datetime
+from oauth2client import client, GOOGLE_TOKEN_URI
 
 # Importing Google Libraries
 import google.oauth2.credentials
 import google_auth_oauthlib.flow
 from googleapiclient.discovery import build
+
+CLIENT_ID = "403176586402-2573bsbcg6ltedsgra1s5lgs5065mbuk.apps.googleusercontent.com"
+CLIENT_SECRET = "f_kT9oFHKr0REkUpYPbTLVAm"
 
 @csrf_exempt
 def login(request):
@@ -93,18 +97,26 @@ def newEvent(request):
 		endTime = datetime.strptime(post['endDate']+' '+post['endTime'],'%m/%d/%Y %H:%M')
 		eventData = Event(name=post['eventName'], categoryId=Category.objects.get(id=post['selectedCategory']), location=post['location'], description=post['description'], url=post['eventPage'], profileId=user, start_time=startTime, end_time=endTime)
 		eventData.save()
+
 		#Calling Google APIs
-		state='yugesh'
-		flow = google_auth_oauthlib.flow.Flow.from_client_secrets_file('client_secret.json',scopes=['https://www.googleapis.com/auth/calendar'],state=state)
 		pushToUsers = userCategory.objects.filter(categoryId=post['selectedCategory']).values('userId')
 		print(pushToUsers)
-		flow.redirect_uri = 'http://localhost:8000/user/handleGoogleResponse'
 		for i in range (0,len(pushToUsers)):
 			userToPush=baseUser.objects.get(profileId=pushToUsers[i]['userId'])
-			flow.fetch_token(code=userToPush.googleCode)
-			userToPush.googleCode=flow.credentials.refresh_token
-			userToPush.save()
-			service = build('calendar', 'v3', credentials=flow.credentials)
+			REFRESH_TOKEN = userToPush.googleCode
+
+			credentials = client.OAuth2Credentials(
+				access_token = None, 
+				client_id = CLIENT_ID, 
+				client_secret = CLIENT_SECRET, 
+				refresh_token = REFRESH_TOKEN, 
+				token_expiry = None, 
+				token_uri = GOOGLE_TOKEN_URI,
+				token_id = None, 
+				revoke_uri= None)
+
+			http = credentials.authorize(httplib2.Http())
+
 			event = {
 				'summary': post['eventName'],
 				'location': post['location'],
@@ -125,6 +137,7 @@ def newEvent(request):
 					],
 				},
 			}
+			service = build('calendar', 'v3', http=http)
 			event = service.events().insert(calendarId='primary', body=event).execute()
 			print('Event created: %s' % (event.get('htmlLink')))
 		return redirect('/publisher.html')
@@ -280,8 +293,15 @@ def handleGoogleResponse(request):
 	print(request.GET['state'])
 	profile=request.session['profileId']
 	user=baseUser.objects.get(profileId=profile)
-	user.googleCode=request.GET['code']
+	
+	## Get credentials
+	state='yugesh'
+	flow = google_auth_oauthlib.flow.Flow.from_client_secrets_file('client_secret.json',scopes=['https://www.googleapis.com/auth/calendar'],state=state)
+	flow.redirect_uri = 'http://localhost:8000/user/handleGoogleResponse'
+	flow.fetch_token(code=userToPush.googleCode)
+	user.googleCode=flow.credentials.refresh_token
 	user.save()
+
 	return redirect('/signUp.html')
 
 
