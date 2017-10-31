@@ -102,20 +102,7 @@ def newEvent(request):
 		print(pushToUsers)
 		for i in range (0,len(pushToUsers)):
 			userToPush=baseUser.objects.get(profileId=pushToUsers[i]['userId'])
-			REFRESH_TOKEN = userToPush.googleCode
-
-			credentials = client.OAuth2Credentials(
-				access_token = None, 
-				client_id = CLIENT_ID, 
-				client_secret = CLIENT_SECRET, 
-				refresh_token = REFRESH_TOKEN, 
-				token_expiry = None, 
-				token_uri = GOOGLE_TOKEN_URI,
-				user_agent=None,
-				revoke_uri= None)
-
-			http = credentials.authorize(httplib2.Http())
-
+			credentials = Credentials.new_from_json(userToPush.googleCode)
 			event = {
 				'summary': post['eventName'],
 				'location': post['location'],
@@ -136,7 +123,7 @@ def newEvent(request):
 					],
 				},
 			}
-			service = build('calendar', 'v3', http=http)
+			service = build('calendar', 'v3', credentials=credentials)
 			event = service.events().insert(calendarId='primary', body=event).execute()
 			print('Event created: %s' % (event.get('htmlLink')))
 		return redirect('/publisher.html')
@@ -297,8 +284,8 @@ def handleGoogleResponse(request):
 	state='yugesh'
 	flow = google_auth_oauthlib.flow.Flow.from_client_secrets_file('client_secret.json',scopes=['https://www.googleapis.com/auth/calendar'],state=state)
 	flow.redirect_uri = 'http://localhost:8000/user/handleGoogleResponse'
-	user.googleCode=request.GET['code']
-	flow.fetch_token(code=user.googleCode)
+	flow.fetch_token(code=request.GET['code'])
+	user.googleCode = flow.credentials.to_json()
 	user.save()
 
 	return redirect('/signUp.html')

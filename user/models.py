@@ -8,7 +8,7 @@ class baseUser(models.Model):
     profileId 	= models.CharField(max_length=200, primary_key=True)
     imageUrl 	= models.CharField(max_length=200)
     userType	= models.CharField(max_length=200)
-    googleCode	= models.CharField(max_length=200,default='')
+    googleCode	= models.CharField(max_length=1000,default='')
         
     def __str__(self):
         return self.name + '-' + self.email + '-' + self.profileId + '-' + self.imageUrl
