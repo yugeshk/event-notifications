@@ -11,6 +11,7 @@ from oauth2client import client, GOOGLE_TOKEN_URI
 # Importing Google Libraries
 import google.oauth2.credentials
 import google_auth_oauthlib.flow
+import httplib2
 from googleapiclient.discovery import build
 
 CLIENT_ID = "403176586402-2573bsbcg6ltedsgra1s5lgs5065mbuk.apps.googleusercontent.com"
@@ -20,7 +21,6 @@ CLIENT_SECRET = "f_kT9oFHKr0REkUpYPbTLVAm"
 def login(request):
 	if(request.method != 'POST'):
 		return redirect('/index.html')
-
 	# Should clean/validate data here
 	post = request.POST
 	query = baseUser.objects.filter(profileId=post['profileId'])
@@ -92,7 +92,6 @@ def newEvent(request):
 	user=baseUser.objects.get(profileId=profile)
 	print(post)
 	if(authenticated=='true'):
-		#Using Start Time end Time. see format of Django
 		startTime = datetime.strptime(post['startDate']+' '+post['startTime'],'%m/%d/%Y %H:%M')
 		endTime = datetime.strptime(post['endDate']+' '+post['endTime'],'%m/%d/%Y %H:%M')
 		eventData = Event(name=post['eventName'], categoryId=Category.objects.get(id=post['selectedCategory']), location=post['location'], description=post['description'], url=post['eventPage'], profileId=user, start_time=startTime, end_time=endTime)
@@ -112,7 +111,7 @@ def newEvent(request):
 				refresh_token = REFRESH_TOKEN, 
 				token_expiry = None, 
 				token_uri = GOOGLE_TOKEN_URI,
-				token_id = None, 
+				user_agent=None,
 				revoke_uri= None)
 
 			http = credentials.authorize(httplib2.Http())
@@ -298,8 +297,8 @@ def handleGoogleResponse(request):
 	state='yugesh'
 	flow = google_auth_oauthlib.flow.Flow.from_client_secrets_file('client_secret.json',scopes=['https://www.googleapis.com/auth/calendar'],state=state)
 	flow.redirect_uri = 'http://localhost:8000/user/handleGoogleResponse'
-	flow.fetch_token(code=userToPush.googleCode)
-	user.googleCode=flow.credentials.refresh_token
+	user.googleCode=request.GET['code']
+	flow.fetch_token(code=user.googleCode)
 	user.save()
 
 	return redirect('/signUp.html')
