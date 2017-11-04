@@ -28,13 +28,16 @@
 	<nav class="navbar navbar-inverse navbar-fixed-top">
   		<div class="container-fluid">
     		<div class="navbar-header">
-      			<a class="navbar-brand" href="#">Calendar</a>
+      			<a class="navbar-brand" href="#">Notifications</a>
     		</div>
     		<ul class="nav navbar-nav">
-      			<li class="active" style="font-size: 16px"><a href="/user.html">Events</a></li>
+      			<li class="active" style="font-size: 16px""><a href="/user.html">Events</a></li>
+    		</ul>
+    		<ul class="nav navbar-nav">
+      			<li class="active" style="font-size: 16px"><a href="https://www.google.com/calendar">Google Calendar</a></li>
     		</ul>
     		<ul class="nav navbar-nav navbar-right">
-    			<p style= "padding-right: 10px; font-size: 16px" class="navbar-text">Name | Roll Number | Department</p>
+    			<p style= "padding-right: 10px; font-size: 16px" class="navbar-text"><span>{{settings.name}} | {{settings.roll}} | {{settings.dept}}</span></p>
       			<li><a href="#" onclick="editSettings();"><span class="glyphicon glyphicon-user"></span> Settings</a></li>
       			<li><a href="#" onclick="signOut();"><span class="glyphicon glyphicon-log-in"></span> Sign Out</a></li>
     		</ul>
@@ -57,10 +60,13 @@
 		app.controller("EventsController", function($scope, $http) {
 			// Some Initial Value
 			$scope.events = [];
+			$scope.settings = [];
 			var getEventsPostOptions = { method: 'POST', url: '/user/getEvents' };
 			function getEventsSuccessFunction(response) {
 				$scope.events = JSON.parse(response.data.eventsJson);
 				console.log($scope.events);
+				$scope.settings=response.data;
+				console.log($scope.settings);
 			}
 			function getEventsFailureFunction(response) {
 				console.log(response);
@@ -85,7 +91,6 @@
 				console.log('Could Not Sign Out');
 			});
 		}
-
 		function onLoad() {
       		gapi.load('auth2', function() {
         		gapi.auth2.init();

@@ -44,7 +44,7 @@
 		<form method="post" action="/user/saveSettings">
 			Roll Number : <input type="text" name="rollNumber" required pattern="[0-9]{6}" title="6 digit IITK Roll Number" value="" placeholder="eg. 170830">
 			<br><br>
-			Department : <select name="department">
+			Department : <select name="department" value={{values.dept}}>
 				<option value="Aerospace Engineering">Aerospace Engineering</option>
 				<option value="Biological Sciences And Bioengineering">Biological Sciences And Bioengineering</option>
 				<option value="Chemical Engineering">Chemical Engineering</option>
@@ -62,12 +62,13 @@
 			</select>
 			<br><br>
 			You would like to be notified about which of the following? <br>
-			<br><br>
+			<br>
 			<div class="categories" ng-repeat="categories in category">
 				<input type="checkbox" id="check" name="selectedCategory" ng-value="categories.pk">
 				<label for="check">{{categories.fields.name}}</label>
 			</div>
-			<input type="submit" value ="Submit">
+			<br>
+			<input type="submit" value ="Update">
 		</form>
 		<script src="https://apis.google.com/js/platform.js?onload=onLoad" async defer></script>
 		<script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.6.4/angular.min.js"></script>
@@ -75,10 +76,12 @@
 			var app= angular.module("Category",[]);
 			app.controller("CategoryController",function($scope,$http) {
 			$scope.category =[];
+			$scope.values=[];
 			var getCaterogyGetOption = {method : 'GET', url :'/user/getCategories'}
 			function getCategoriesSuccessFunction(response) {
 				$scope.category = JSON.parse(response.data.categoryJson);
 				console.log($scope.category)
+				$scope.value=response.data
 			}
 			function getCategoriesFailureFunction(response) {
 				console.log(response)

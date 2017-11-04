@@ -6,6 +6,7 @@ from django import forms
 import json
 from django.core import serializers
 from datetime import datetime
+import datetime
 from oauth2client import client, GOOGLE_TOKEN_URI
 
 # Importing Google Libraries
@@ -181,14 +182,14 @@ def getAllCategories(request):
 
 def getCategories(request):
 	if(request.method=='GET'):
+		baseUserData=baseUser.objects.get(profileId=request.session['profileId'])
+		settings=userSettings.objects.get(profileId=baseUserData)
 		categoryJson = serializers.serialize("json", Category.objects.all())
-		data = {"categoryJson" : categoryJson}
+		data = {"categoryJson" : categoryJson, "roll" : settings.rollNumber, "dept" : settings.department }
 		print(data)
 		return JsonResponse(data)
 	# Identify user using request.session['profileId']
 	# Return array of all categories having boolean to show if user is interested or not.
-	# eg Response [{ name: 'Coding', interested: true }, { name: 'Robotics', interested: false }]
-	#return HttpResponse("Hello World. You're at the poll index. GETCATEGORIES")
 def saveCategories(request):
 	# Identify user using request.session['profileId']
 	# Accept data in this format Response [{ name: 'Coding', interested: true }, { name: 'Robotics', interested: false }]
@@ -211,8 +212,10 @@ def saveSettings(request):
 	if(baseUserData.userType=='user'):
 		if(userSettings.objects.filter(profileId=baseUserData)):
 			user=userSettings.objects.get(profileId=profile)
-			user.delete()
-			user=userSettings(profileId=baseUser.objects.get(profileId=profile),rollNumber=post['rollNumber'],department=post['department'])
+			userCategoryData=userCategory.objects.filter(userId=baseUserData)
+			userCategoryData.delete()
+			user.rollNumber=post['rollNumber']
+			user.department=post['department']
 			user.save()
 			for i in range (0,len(selected['selectedCategory'])):
 				categoryData=Category.objects.get(id=selected['selectedCategory'][i])
@@ -253,26 +256,22 @@ def getEvents(request):
 	# Return array of events relevant to that user.
 	profile=request.session['profileId']
 	post=request.POST
+	now=datetime.date.today()
 	baseUserData=baseUser.objects.get(profileId=profile)
+	settings=userSettings.objects.get(profileId=baseUserData)
 	if(baseUserData.userType=='publisher'):
-		eventsJson = serializers.serialize("json", Event.objects.filter(profileId=baseUserData))
+		eventsJson = serializers.serialize("json", Event.objects.filter(profileId=baseUserData, start_time__date__gte=now))
 		data = {"eventsJson" : eventsJson}
 		print(data)
 		return JsonResponse(data)
 	elif(baseUserData.userType=='user'):
-		#categoryJson = serializers.serialize("json", userCategory.objects.filter(userId=baseUserData))
-		#categoryData = {"categoryJson" : categoryJson}
-		#print(categoryData)
-		#userCategoryData=Category.objects.filter(id__in=categoryDatafields.categoryId)
-		#print(userCategoryData)
-		eventData = Event.objects.raw('SELECT * FROM user_event INNER JOIN user_usercategory ON user_event.categoryId_id=user_usercategory.categoryId_id AND user_usercategory.userId_id='+'"'+request.session['profileId']+'"')
+		eventData = Event.objects.raw('SELECT * FROM user_event INNER JOIN user_usercategory ON user_event.categoryId_id=user_usercategory.categoryId_id AND user_usercategory.userId_id='+'"'+request.session['profileId']+'"'+"AND user_event.start_time >= DATETIME('now')")
 		print(eventData)
 		eventsJson = serializers.serialize("json", eventData)
-		data = {"eventsJson" : eventsJson}
+		data = {"eventsJson" : eventsJson, "name" : baseUserData.name, "roll" : settings.rollNumber, "dept" : settings.department}
 		print(data)
 		return JsonResponse(data)
-		#return JsonResponse({'data': [{'name': 'Programming Contest','start_time': '1506686400','end_time': '1506688400','location': 'Hall 5, IIT Kanpur','description': 'Online hackathon. 5 member teams.','publishedBy': 'Programming CLub'},{'name': 'Programming Contest','start_time': '1506686400','end_time': '1506688400','location': 'Hall 5, IIT Kanpur','description': 'Online hackathon. 5 member teams.','publishedBy': 'Programming CLub'},{'name': 'Programming Contest','start_time': '1506686400','end_time': '1506688400','location': 'Hall 5, IIT Kanpur','description': 'Online hackathon. 5 member teams.','publishedBy': 'Programming CLub'},{'name': 'Programming Contest','start_time': '1506686400','end_time': '1506688400','location': 'Hall 5, IIT Kanpur','description': 'Online hackathon. 5 member teams.','publishedBy': 'Programming CLub'},{'name': 'Programming Contest','start_time': '1506686400','end_time': '1506688400','location': 'Hall 5, IIT Kanpur','description': 'Online hackathon. 5 member teams.','publishedBy': 'Programming CLub'}]})
-
+		
 @csrf_exempt
 def handleGoogleResponse(request):
 	print(request.GET['code'])
