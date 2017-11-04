@@ -5,7 +5,6 @@ from django.views.decorators.csrf import csrf_exempt
 from django import forms
 import json
 from django.core import serializers
-from datetime import datetime
 import datetime
 from oauth2client import client, GOOGLE_TOKEN_URI
 
@@ -183,11 +182,18 @@ def getAllCategories(request):
 def getCategories(request):
 	if(request.method=='GET'):
 		baseUserData=baseUser.objects.get(profileId=request.session['profileId'])
-		settings=userSettings.objects.get(profileId=baseUserData)
-		categoryJson = serializers.serialize("json", Category.objects.all())
-		data = {"categoryJson" : categoryJson, "roll" : settings.rollNumber, "dept" : settings.department }
-		print(data)
-		return JsonResponse(data)
+		if(baseUserData.userType=='user'):
+			settings=userSettings.objects.get(profileId=baseUserData)
+			categoryJson = serializers.serialize("json", Category.objects.all())
+			data = {"categoryJson" : categoryJson, "roll" : settings.rollNumber, "dept" : settings.department }
+			print(data)
+			return JsonResponse(data)
+		elif(baseUserData.userType=='publisher'):
+			settings=publisherSettings.objects.get(profileId=baseUserData)
+			categoryJson = serializers.serialize("json", Category.objects.all())
+			data = {"categoryJson" : categoryJson, "name" : settings.displayName}
+			print(data)
+			return JsonResponse(data)
 	# Identify user using request.session['profileId']
 	# Return array of all categories having boolean to show if user is interested or not.
 def saveCategories(request):
@@ -258,13 +264,14 @@ def getEvents(request):
 	post=request.POST
 	now=datetime.date.today()
 	baseUserData=baseUser.objects.get(profileId=profile)
-	settings=userSettings.objects.get(profileId=baseUserData)
 	if(baseUserData.userType=='publisher'):
+		settings=publisherSettings.objects.get(profileId=baseUserData)
 		eventsJson = serializers.serialize("json", Event.objects.filter(profileId=baseUserData, start_time__date__gte=now))
-		data = {"eventsJson" : eventsJson}
+		data = {"eventsJson" : eventsJson, "name" : settings.displayName}
 		print(data)
 		return JsonResponse(data)
 	elif(baseUserData.userType=='user'):
+		settings=userSettings.objects.get(profileId=baseUserData)
 		eventData = Event.objects.raw('SELECT * FROM user_event INNER JOIN user_usercategory ON user_event.categoryId_id=user_usercategory.categoryId_id AND user_usercategory.userId_id='+'"'+request.session['profileId']+'"'+"AND user_event.start_time >= DATETIME('now')")
 		print(eventData)
 		eventsJson = serializers.serialize("json", eventData)

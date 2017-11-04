@@ -2,13 +2,33 @@
 <html>
 <head>
 	<title>Publisher Settings</title>
+	<script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.6.6/angular.min.js"></script>
 	<!--BootStrap-->
 	<link rel="stylesheet" type="text/css" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+	<meta name="google-signin-client_id" content="403176586402-2573bsbcg6ltedsgra1s5lgs5065mbuk.apps.googleusercontent.com">
+	<script src="http://code.jquery.com/jquery-1.11.0.min.js"></script>
 </head>
 <body>
 	<div class="container">
-		<div>
-			<h1>This is the Pubisher settings Page.</h1>
+		<nav class="navbar navbar-inverse navbar-fixed-top">
+  			<div class="container-fluid">
+    			<div class="navbar-header">
+      				<a class="navbar-brand" href="#">Notifications</a>
+    			</div>
+    			<ul class="nav navbar-nav">
+      				<li class="active" style="font-size: 16px""><a href="/publisher.html">Home Page</a></li>
+    			</ul>
+    			<ul class="nav navbar-nav">
+      				<li class="active" style="font-size: 16px"><a href="#" onclick="create();">New Event</a></li>
+    			</ul>
+    			<ul class="nav navbar-nav navbar-right">
+    				<p style= "padding-right: 16px; font-size: 16px" class="navbar-text"><span>{{alias}}</span></p>
+      				<li><a href="#" onclick="editSettings();"><span class="glyphicon glyphicon-user"></span> Settings</a></li>
+      				<li><a href="#" onclick="signOut();"><span class="glyphicon glyphicon-log-in"></span> Sign Out</a></li>
+    			</ul>
+  			</div>
+		</nav>
+		<div style="padding-top: 120px">
 			<form method="post" action="/user/saveSettings">
 				Alias : <input type="text" name="Alias" required placeholder="eg. Robotics Club, IITK">
 				<br><br>
@@ -16,9 +36,39 @@
 				<br><br>
 				Contact Number : <input type="tel" name="contactNumber">
 				<br><br>
-				<input type="submit" value="Submit">
+				<input type="submit" value="Update">
 		</div>
 	</form>
+	<script src="https://apis.google.com/js/platform.js?onload=onLoad" async defer></script>
+	<script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.6.4/angular.min.js"></script>
+	<script>
+		function signOut() {
+			var auth2 = gapi.auth2.getAuthInstance();
+			auth2.signOut().then(function reportSignOut() {
+				console.log('User signed out.');
+				$.post('/user/logout', {}, function(response) {
+					window.location = response.url;
+				})
+			}, function reportCouldNotSignOut() {
+				console.log('Could Not Sign Out');
+			});
+		}
+		function onLoad() {
+      		gapi.load('auth2', function() {
+        		gapi.auth2.init();
+      		});
+    	}
+	</script>
+	<script type="text/javascript">
+		function create() {
+			window.location = '/newEvent.html'
+		}
+	</script>
+	<script type="text/javascript"> 
+		function editSettings() {
+			window.location = '/publisherSettings.html';
+		}
+	</script>
 </div>
 </body>
 </html>
