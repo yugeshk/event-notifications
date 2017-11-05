@@ -25,7 +25,7 @@ SECRET_KEY = '3pdcpj0ez&t8uh4f)bpw%(3t@7l)7i6ry#n!i622+x5cz-w*$0'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['arcane-headland-78009.herokuapp.com']
 
 
 # Application definition
