@@ -2,12 +2,16 @@
 <html>
 <head>
 	<title>Event Search</title>
+	<!-- Angular JS, Import once at the top of the page -->
 	<script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.6.6/angular.min.js"></script>
 	<!-- Bootstrap -->
 	<link rel="stylesheet" type="text/css" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+	<!-- Css For JQuery UI -->
+    <link rel="stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/jqueryui/1.12.1/jquery-ui.min.css">
+    <!-- Css For Plugin -->
 	<link rel="stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/jquery-ui-timepicker-addon/1.6.3/jquery-ui-timepicker-addon.min.css">
+
 	<meta name="google-signin-client_id" content="403176586402-2573bsbcg6ltedsgra1s5lgs5065mbuk.apps.googleusercontent.com">
-	<script src="http://code.jquery.com/jquery-1.11.0.min.js"></script>
 </head>
 <body ng-app="Events">
 	<div class="container">
@@ -31,19 +35,17 @@
 		<div style="padding-top: 80px" ng-controller="EventsController">
 			<h2> Enter your search query:</h2>
 			<br><br>
-			<form>
-				Start Date : <input id="datepicker1" type="date" name="startDate" required ng-model="startDate">
+				Start Date : <input id="datepicker1" name="startDate" required>
 				&nbsp;&nbsp;
-            	Start Time : <input id="timePicker1" type="time" name="startTime" required ng-model="startTime">
+            	Start Time : <input id="timePicker1" name="startTime" required>
             	&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-            	End Date : <input id="datepicker2" type="date" name="endDate" required ng-model="endDate">
+            	End Date : <input id="datepicker2" name="endDate" required>
             	&nbsp;&nbsp;
-            	End Time : <input id="timePicker2" type="time" name="endTime" required ng-model="endTime">
+            	End Time : <input id="timePicker2" name="endTime" required>
             	<br><br>
             	<div class="buttonholder" style="text-align: center;">
-            		<input type="submit" name="Search" ng-click="searchFunc()">
+            		<button name="Search" ng-click="searchFunc()"> Search </button>
             	</div>
-			</form>
 		</div>
 		<div style="padding-top: 80px" ng-controller="EventsController">
 			<div class="col-md-9" style="padding-top: 80px">
@@ -56,8 +58,8 @@
 		</div>			
 		</div>
 	</div>
+
 	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-datetimepicker/2.5.4/build/jquery.datetimepicker.full.min.js"></script>
     <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jqueryui/1.12.1/jquery-ui.min.js"></script>
     <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jquery-ui-timepicker-addon/1.6.3/jquery-ui-timepicker-addon.min.js"></script>
     <script type="text/javascript">
@@ -69,7 +71,6 @@
         $('#timePicker2').timepicker();
     </script>
 	<script src="https://apis.google.com/js/platform.js?onload=onLoad" async defer></script>
-	<script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.6.4/angular.min.js"></script>
 	<script>
 		function signOut() {
 			var auth2 = gapi.auth2.getAuthInstance();
@@ -100,35 +101,48 @@
 		}
 		</script>
 	<script type="text/javascript">
-			var app= angular.module("Events",[]);
-			app.controller("EventsController",function($scope,$http) {
-			$scope.events =[];
-			$scope.startDate="11/01/2017";
-			$scope.startTime="22:00";
-			$scope.endDate="11/11/2017";
-			$scope.endTime="22:00";
-			var getEventsGetOption = {method : 'POST', url :'/user/search', data: {"startDate" : $scope.startDate, "startTime" : $scope.startTime, "endDate" : $scope.endDate, "endTime" : $scope.endTime}};
-			function getEventsSuccessFunction(response) {
-				$scope.events = JSON.parse(response.data.eventsJson);
-				console.log($scope.events);
-			}
-			function getEventsFailureFunction(response) {
-				console.log(response);
-			}
+		var app= angular.module("Events",[]);
+		app.controller("EventsController",function($scope,$http) {
+			
+			$scope.events = [];
+			
 			$scope.searchFunc= function(){
-				console.log(getEventsGetOption.data);
-				$http(getEventsGetOption).then(getEventsSuccessFunction, getEventsFailureFunction);
+				
+				var options = {
+					method : 'POST', 
+					url :'/user/search', 
+					data: {
+						"startDate" : $('#datepicker1').val(), 
+						"startTime" : $('#datepicker2').val(), 
+						"endDate" 	: $('#timePicker1').val(), 
+						"endTime" 	: $('#timePicker2').val()
+					}
+				};
+				console.log(options);
+
+				var successFunction = function(res) {
+					console.log('Success');
+					$scope.events = JSON.parse(response.data.eventsJson);
+					console.log($scope.events);		
+				} 
+
+				var failureFunction = function(res) {
+					console.log('Failure');
+					console.log(res);
+				}
+
+				$http(options).then(successFunction, failureFunction);
 			};
-			});
-			app.controller("PageData", function($scope,$http) {
-				$scope.alias="";
-				$http({method : 'POST', url: '/user/pageData'}).then(function(response){
+		});
+		app.controller("PageData", function($scope,$http) {
+			$scope.alias="";
+			$http({method : 'POST', url: '/user/pageData'}).then(function(response){
 				$scope.alias=response.data.name;
 				console.log(response);
 			},function(response){
 				console.log(response);
 			});
-			});
+		});
 		</script>
 </body>
 </html>
