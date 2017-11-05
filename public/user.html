@@ -24,7 +24,7 @@
 	<meta name="google-signin-client_id" content="403176586402-2573bsbcg6ltedsgra1s5lgs5065mbuk.apps.googleusercontent.com">
 
 </head>
-<body ng-app="Events" ng-controller="EventsController">
+<body ng-app="Events">
 	<nav class="navbar navbar-inverse navbar-fixed-top">
   		<div class="container-fluid">
     		<div class="navbar-header">
@@ -37,13 +37,13 @@
       			<li class="active" style="font-size: 16px"><a href="https://www.google.com/calendar">Google Calendar</a></li>
     		</ul>
     		<ul class="nav navbar-nav navbar-right">
-    			<p style= "padding-right: 10px; font-size: 16px" class="navbar-text"><span>{{settings.name}} | {{settings.roll}} | {{settings.dept}}</span></p>
+    			<p style= "padding-right: 10px; font-size: 16px" class="navbar-text"><span ng-controller="PageData">{{settings.name}} | {{settings.roll}} | {{settings.dept}}</span></p>
       			<li><a href="#" onclick="editSettings();"><span class="glyphicon glyphicon-user"></span> Settings</a></li>
       			<li><a href="#" onclick="signOut();"><span class="glyphicon glyphicon-log-in"></span> Sign Out</a></li>
     		</ul>
   		</div>
 	</nav>
-	<div class="container" style="padding-top: 80px">
+	<div class="container" style="padding-top: 80px" ng-controller="EventsController">
 		<div class="col-md-9">
 			<div class="event" ng-repeat="event in events" style="background-color: #f0f0ea; padding: 20px;border-radius: 10px; margin: 5px;">
 				<h3> {{event.fields.name}} @ {{event.fields.location}}</h3>
@@ -60,18 +60,24 @@
 		app.controller("EventsController", function($scope, $http) {
 			// Some Initial Value
 			$scope.events = [];
-			$scope.settings = [];
 			var getEventsPostOptions = { method: 'POST', url: '/user/getEvents' };
 			function getEventsSuccessFunction(response) {
 				$scope.events = JSON.parse(response.data.eventsJson);
 				console.log($scope.events);
-				$scope.settings=response.data;
-				console.log($scope.settings);
 			}
 			function getEventsFailureFunction(response) {
 				console.log(response);
 			}
 			$http(getEventsPostOptions).then(getEventsSuccessFunction, getEventsFailureFunction);
+		});
+		app.controller("PageData", function($scope,$http) {
+			$scope.settings = [];
+			$http({method : 'POST', url: '/user/pageData'}).then(function(response){
+				$scope.settings=response.data;
+				console.log($scope.settings);
+			},function(response){
+				console.log(response);
+			});
 		});
 	</script>
 	<script type="text/javascript"> 

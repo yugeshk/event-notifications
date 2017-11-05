@@ -20,26 +20,29 @@
 	<link rel="stylesheet" type="text/css" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
 	<meta name="google-signin-client_id" content="403176586402-2573bsbcg6ltedsgra1s5lgs5065mbuk.apps.googleusercontent.com">
 </head>
-<nav class="navbar navbar-inverse navbar-fixed-top">
-  		<div class="container-fluid">
-    		<div class="navbar-header">
-      			<a class="navbar-brand" href="#">Calendar</a>
-    		</div>
-    		<ul class="nav navbar-nav">
-      			<li class="active" style="font-size: 16px"><a href="/user.html">Events</a></li>
-    		</ul>
-    		<ul class="nav navbar-nav navbar-right">
-    			<p style= "padding-right: 10px; font-size: 16px" class="navbar-text">Name | Roll Number | Department</p>
-      			<li><a href="#" onclick="editSettings();"><span class="glyphicon glyphicon-user"></span> Settings</a></li>
-      			<li><a href="#" onclick="signOut();"><span class="glyphicon glyphicon-log-in"></span> Sign Out</a></li>
-    		</ul>
-  		</div>
-	</nav>
-<body ng-app="Category" ng-controller="CategoryController" style="padding-top: 80px" >
+<body ng-app="Category" style="padding-top: 80px" >
 	<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
 	<script src="https://apis.google.com/js/platform.js" async defer></script>
 	<script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.6.4/angular.min.js"></script>
-	<div class="container">
+	<nav class="navbar navbar-inverse navbar-fixed-top">
+  		<div class="container-fluid" ng-controller="PageData">
+    		<div class="navbar-header">
+    			<a class="navbar-brand" href="#">Notifications</a>
+    		</div>
+    		<ul class="nav navbar-nav">
+    			<li class="active" style="font-size: 16px""><a href="/user.html">Events</a></li>
+    		</ul>
+    		<ul class="nav navbar-nav">
+    			<li class="active" style="font-size: 16px"><a href="https://www.google.com/calendar">Google Calendar</a></li>
+    		</ul>
+    		<ul class="nav navbar-nav navbar-right">
+    			<p style= "padding-right: 10px; font-size: 16px" class="navbar-text"><span ng-controller="PageData">{{settings.name}} | {{settings.roll}} | {{settings.dept}}</span></p>
+    			<li><a href="#" onclick="editSettings();"><span class="glyphicon glyphicon-user"></span> Settings</a></li>
+    			<li><a href="#" onclick="signOut();"><span class="glyphicon glyphicon-log-in"></span> Sign Out</a></li>
+    		</ul>
+  		</div>
+	</nav>
+	<div class="container" ng-controller="CategoryController">
 		<h1> User Settings </h1>
 		<form method="post" action="/user/saveSettings">
 			Roll Number : <input type="text" name="rollNumber" required pattern="[0-9]{6}" title="6 digit IITK Roll Number" value="" placeholder="eg. 170830">
@@ -88,6 +91,15 @@
 			}
 			$http(getCaterogyGetOption).then(getCategoriesSuccessFunction, getCategoriesFailureFunction);
 			});
+			app.controller("PageData", function($scope,$http) {
+			$scope.settings = [];
+			$http({method : 'POST', url: '/user/pageData'}).then(function(response){
+				$scope.settings=response.data;
+				console.log($scope.settings);
+			},function(response){
+				console.log(response);
+			});
+		});
 		</script>
 		<script type="text/javascript"> 
 		function editSettings() {

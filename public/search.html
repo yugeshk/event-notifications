@@ -120,7 +120,7 @@
 				};
 				console.log(options);
 
-				var successFunction = function(res) {
+				var successFunction = function(response) {
 					console.log('Success');
 					$scope.events = JSON.parse(response.data.eventsJson);
 					console.log($scope.events);		

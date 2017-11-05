@@ -183,15 +183,13 @@ def getCategories(request):
 	if(request.method=='GET'):
 		baseUserData=baseUser.objects.get(profileId=request.session['profileId'])
 		if(baseUserData.userType=='user'):
-			settings=userSettings.objects.get(profileId=baseUserData)
 			categoryJson = serializers.serialize("json", Category.objects.all())
-			data = {"categoryJson" : categoryJson, "roll" : settings.rollNumber, "dept" : settings.department }
+			data = {"categoryJson" : categoryJson}
 			print(data)
 			return JsonResponse(data)
 		elif(baseUserData.userType=='publisher'):
-			settings=publisherSettings.objects.get(profileId=baseUserData)
 			categoryJson = serializers.serialize("json", Category.objects.all())
-			data = {"categoryJson" : categoryJson, "name" : settings.displayName}
+			data = {"categoryJson" : categoryJson}
 			print(data)
 			return JsonResponse(data)
 	# Identify user using request.session['profileId']
@@ -271,11 +269,10 @@ def getEvents(request):
 		print(data)
 		return JsonResponse(data)
 	elif(baseUserData.userType=='user'):
-		settings=userSettings.objects.get(profileId=baseUserData)
 		eventData = Event.objects.raw('SELECT * FROM user_event INNER JOIN user_usercategory ON user_event.categoryId_id=user_usercategory.categoryId_id AND user_usercategory.userId_id='+'"'+request.session['profileId']+'"'+"AND user_event.start_time >= DATETIME('now')")
 		print(eventData)
 		eventsJson = serializers.serialize("json", eventData)
-		data = {"eventsJson" : eventsJson, "name" : baseUserData.name, "roll" : settings.rollNumber, "dept" : settings.department}
+		data = {"eventsJson" : eventsJson}
 		print(data)
 		return JsonResponse(data)
 		
@@ -300,6 +297,8 @@ def handleGoogleResponse(request):
 def search(request):
 	post=request.POST
 	user=baseUser.objects.get(profileId=request.session['profileId'])
+	print(request)
+	print("This right here")
 	startTime = datetime.datetime.strptime(post['startDate']+' '+post['startTime'],'%m/%d/%Y %H:%M')
 	endTime = datetime.datetime.strptime(post['endDate']+' '+post['endTime'],'%m/%d/%Y %H:%M')
 	eventData=Event.objects.filter(start_time__range=(startTime,endTime))
@@ -312,10 +311,17 @@ def search(request):
 def pageData(request):
 	baseUserData=baseUser.objects.get(profileId=request.session['profileId'])
 	if(baseUserData.userType=='publisher'):
-		settings=publisherSettings.objects.get(profileId=baseUserData)
-		data={"name" : settings.displayName}
-		print(data)
-		return JsonResponse(data)
+		settings=publisherSettings.objects.filter(profileId=baseUserData)
+		if(len(settings)!=0):
+			data={"name" : settings.first().displayName}
+			print(data)
+			return JsonResponse(data)
+		elif(len(settings)==0):
+			data={"name" : "Name"}
+			return JsonResponse(data)
 	elif(baseUserData.userType=='user'):
-		settings=userSettings.objects.get(profileId=baseUserData)
-		return JsonResponse({"name" : baseUserData.name, "roll" : settings.rollNumber, "dept" : settings.department})
+		settings=userSettings.objects.filter(profileId=baseUserData)
+		if(len(settings)!=0):
+			return JsonResponse({"name" : baseUserData.name, "roll" : settings.first().rollNumber, "dept" : settings.first().department})
+		elif(len(settings)==0):
+			return JsonResponse({"name" : "Name", "roll" : "Roll Number", "dept" : "Department"})

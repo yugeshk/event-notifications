@@ -11,7 +11,7 @@
     <meta name="google-signin-client_id" content="403176586402-2573bsbcg6ltedsgra1s5lgs5065mbuk.apps.googleusercontent.com">
     <script src="http://code.jquery.com/jquery-1.11.0.min.js"></script>
 </head>
-<body ng-app="Category" ng-controller="CategoryController">
+<body ng-app="Category">
     <div class="container">
         <nav class="navbar navbar-inverse navbar-fixed-top">
             <div class="container-fluid">
@@ -24,13 +24,13 @@
                     <li class="active" style="font-size: 16px"><a href="/search.html">Search</a></li>
                 </ul>
                 <ul class="nav navbar-nav navbar-right">
-                    <p style= "padding-right: 10px; font-size: 16px" class="navbar-text"><span>{{alias}}</span></p>
+                    <p style= "padding-right: 10px; font-size: 16px" class="navbar-text"><span ng-controller="PageData">{{alias}}</span></p>
                     <li><a href="#" onclick="editSettings();"><span class="glyphicon glyphicon-user"></span> Settings</a></li>
                     <li><a href="#" onclick="signOut();"><span class="glyphicon glyphicon-log-in"></span> Sign Out</a></li>
                 </ul>
             </div>
         </nav>
-        <form action="/user/newEvent" method="post" style="padding-top: 80px">
+        <form action="/user/newEvent" method="post" style="padding-top: 80px" ng-controller="CategoryController">
             Event Name : <input type="text" name="eventName" placeholder="eg. Lecture/Workshop on xyz" required style="width: 300px">
             <br><br>
             Event Type :
@@ -110,6 +110,15 @@
 			}
 			$http(getCaterogyGetOption).then(getCategoriesSuccessFunction, getCategoriesFailureFunction);
 			});
+            app.controller("PageData", function($scope,$http) {
+                $scope.alias="";
+                $http({method : 'POST', url: '/user/pageData'}).then(function(response){
+                $scope.alias=response.data.name;
+                console.log(response);
+            },function(response){
+                console.log(response);
+            });
+            });
 		</script>
     </div>
 </body>
