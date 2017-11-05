@@ -92,8 +92,8 @@ def newEvent(request):
 	user=baseUser.objects.get(profileId=profile)
 	print(post)
 	if(authenticated=='true'):
-		startTime = datetime.strptime(post['startDate']+' '+post['startTime'],'%m/%d/%Y %H:%M')
-		endTime = datetime.strptime(post['endDate']+' '+post['endTime'],'%m/%d/%Y %H:%M')
+		startTime = datetime.datetime.strptime(post['startDate']+' '+post['startTime'],'%m/%d/%Y %H:%M')
+		endTime = datetime.datetime.strptime(post['endDate']+' '+post['endTime'],'%m/%d/%Y %H:%M')
 		eventData = Event(name=post['eventName'], categoryId=Category.objects.get(id=post['selectedCategory']), location=post['location'], description=post['description'], url=post['eventPage'], profileId=user, start_time=startTime, end_time=endTime)
 		eventData.save()
 

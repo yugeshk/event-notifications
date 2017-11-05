@@ -28,24 +28,24 @@
     			</ul>
   			</div>
 		</nav>
-		<div style="padding-top: 80px">
+		<div style="padding-top: 80px" ng-controller="EventsController">
 			<h2> Enter your search query:</h2>
 			<br><br>
-			<form action="/user/search" method="post">
-				Start Date : <input id="datepicker1" type="date" name="startDate" required>
+			<form>
+				Start Date : <input id="datepicker1" type="date" name="startDate" required ng-model="startDate">
 				&nbsp;&nbsp;
-            	Start Time : <input id="timePicker1" type="time" name="startTime" required>
+            	Start Time : <input id="timePicker1" type="time" name="startTime" required ng-model="startTime">
             	&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-            	End Date : <input id="datepicker2" type="date" name="endDate" required>
+            	End Date : <input id="datepicker2" type="date" name="endDate" required ng-model="endDate">
             	&nbsp;&nbsp;
-            	End Time : <input id="timePicker2" type="time" name="endTime" required>
+            	End Time : <input id="timePicker2" type="time" name="endTime" required ng-model="endTime">
             	<br><br>
             	<div class="buttonholder" style="text-align: center;">
-            		<input type="submit" name="Search">
+            		<input type="submit" name="Search" ng-click="searchFunc()">
             	</div>
 			</form>
 		</div>
-		<div style="padding-top: 80px" ng-controller="EventsControllers">
+		<div style="padding-top: 80px" ng-controller="EventsController">
 			<div class="col-md-9" style="padding-top: 80px">
 				<div class="event" ng-repeat="event in events" style="background-color: #f0f0ea; padding: 20px;border-radius: 10px; margin: 5px;">
 				<h3> {{event.fields.name}} @ {{event.fields.location}}</h3>
@@ -69,6 +69,7 @@
         $('#timePicker2').timepicker();
     </script>
 	<script src="https://apis.google.com/js/platform.js?onload=onLoad" async defer></script>
+	<script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.6.4/angular.min.js"></script>
 	<script>
 		function signOut() {
 			var auth2 = gapi.auth2.getAuthInstance();
@@ -102,7 +103,11 @@
 			var app= angular.module("Events",[]);
 			app.controller("EventsController",function($scope,$http) {
 			$scope.events =[];
-			var getEventsGetOption = {method : 'POST', url :'/user/search'}
+			$scope.startDate="11/01/2017";
+			$scope.startTime="22:00";
+			$scope.endDate="11/11/2017";
+			$scope.endTime="22:00";
+			var getEventsGetOption = {method : 'POST', url :'/user/search', data: {"startDate" : $scope.startDate, "startTime" : $scope.startTime, "endDate" : $scope.endDate, "endTime" : $scope.endTime}};
 			function getEventsSuccessFunction(response) {
 				$scope.events = JSON.parse(response.data.eventsJson);
 				console.log($scope.events);
@@ -110,7 +115,10 @@
 			function getEventsFailureFunction(response) {
 				console.log(response);
 			}
-			$http(getEventsGetOption).then(getEventsSuccessFunction, getEventsFailureFunction);
+			$scope.searchFunc= function(){
+				console.log(getEventsGetOption.data);
+				$http(getEventsGetOption).then(getEventsSuccessFunction, getEventsFailureFunction);
+			};
 			});
 			app.controller("PageData", function($scope,$http) {
 				$scope.alias="";
