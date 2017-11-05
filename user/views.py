@@ -296,6 +296,13 @@ def handleGoogleResponse(request):
 
 	return redirect('/signUp.html')
 
-
-#Edits in the future
-#Only certain fields can be serialized
+@csrf_exempt
+def seacrh(request):
+	post=request.POST
+	user=baseUser.objects.get(profileId=request.session['profileId'])
+	startTime = datetime.strptime(post['startDate']+' '+post['startTime'],'%m/%d/%Y %H:%M')
+	endTime = datetime.strptime(post['endDate']+' '+post['endTime'],'%m/%d/%Y %H:%M')
+	eventData=Event.objects.filter(start_time__datetime__gte=startTime,end_time__datetime__lte=endTime)
+	eventsJson = serializers.serialize("json", eventData)
+	data = {"eventsJson" : eventsJson, "name" : userSettings.objects.get(profileId=user).displayName}
+	return JsonResponse(data)

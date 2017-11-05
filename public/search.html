@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-	<title>Publisher Home Page</title>
+	<title>Event Search</title>
 	<script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.6.6/angular.min.js"></script>
 	<!-- Bootstrap -->
 	<link rel="stylesheet" type="text/css" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
@@ -9,7 +9,7 @@
 	<meta name="google-signin-client_id" content="403176586402-2573bsbcg6ltedsgra1s5lgs5065mbuk.apps.googleusercontent.com">
 	<script src="http://code.jquery.com/jquery-1.11.0.min.js"></script>
 </head>
-<body ng-app="Events" ng-controller="EventsController">
+<body>
 	<div class="container">
 		<nav class="navbar navbar-inverse navbar-fixed-top">
   			<div class="container-fluid">
@@ -22,9 +22,9 @@
     			<ul class="nav navbar-nav">
       				<li class="active" style="font-size: 16px"><a href="#" onclick="create();">New Event</a></li>
     			</ul>
-     			<ul class="nav navbar-nav">
+<!--     			<ul class="nav navbar-nav">
     				<li class="active" style="font-size: 16px"><a href="#">Search</li>
-    			</ul>
+    			</ul> -->
     			<ul class="nav navbar-nav navbar-right">
     				<p style= "padding-right: 16px; font-size: 16px" class="navbar-text"><span>{{alias}}</span></p>
       				<li><a href="#" onclick="editSettings();"><span class="glyphicon glyphicon-user"></span> Settings</a></li>
@@ -32,19 +32,36 @@
     			</ul>
   			</div>
 		</nav>
-		<!--<button onclick="create();">Create New Events</button>-->
-		<div class="col-md-9" style="padding-top: 80px">
-			<div class="event" ng-repeat="event in events" style="background-color: #f0f0ea; padding: 20px;border-radius: 10px; margin: 5px;">
-				<h3> {{event.fields.name}} @ {{event.fields.location}}</h3>
-				<p> {{event.fields.start_time | date: ' HH:mm dd/MM/yyyy '}} to {{event.fields.end_time | date: ' HH:mm dd/MM/yyyy '}} </p>
-				<p> Relevant Url : {{event.fields.url}}</p>
-				<p> {{event.fields.description}} </p>
-			</div>
-		</div>
-		<div>
-			<a href="#" onclick="signOut();">Sign out</a>
+		<div style="padding-top: 80px">
+			<h2> Enter your search query:</h2>
+			<br><br>
+			<form action="/user/search" method="post">
+				Start Date : <input id="datepicker1" type="date" name="startDate" required>
+				&nbsp;&nbsp;
+            	Start Time : <input id="timePicker1" type="time" name="startTime" required>
+            	&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+            	End Date : <input id="datepicker2" type="date" name="endDate" required>
+            	&nbsp;&nbsp;
+            	End Time : <input id="timePicker2" type="time" name="endTime" required>				
+			</form>
 		</div>
 	</div>
+	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-datetimepicker/2.5.4/build/jquery.datetimepicker.full.min.js"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jqueryui/1.12.1/jquery-ui.min.js"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jquery-ui-timepicker-addon/1.6.3/jquery-ui-timepicker-addon.min.js"></script>
+    <script type="text/javascript">
+        // Timpicker plugin docs http://trentrichardson.com/examples/timepicker/
+        // Datepicker plugin docs https://jqueryui.com/datepicker/
+        $('#datepicker1').datepicker();
+        $('#datepicker2').datepicker();
+        $('#timePicker1').timepicker();
+        $('#timePicker2').timepicker();
+    </script>
+    <script type="text/javascript">
+    	var app = angular.module("Events", []);
+    	app.controller("EventsController", function)
+    </script>
 	<script src="https://apis.google.com/js/platform.js?onload=onLoad" async defer></script>
 	<script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.6.4/angular.min.js"></script>
 	<script>
