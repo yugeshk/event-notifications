@@ -9,7 +9,7 @@
 	<meta name="google-signin-client_id" content="403176586402-2573bsbcg6ltedsgra1s5lgs5065mbuk.apps.googleusercontent.com">
 	<script src="http://code.jquery.com/jquery-1.11.0.min.js"></script>
 </head>
-<body ng-app="Events" ng-controller="EventsController">
+<body ng-app="Events">
 	<div class="container">
 		<nav class="navbar navbar-inverse navbar-fixed-top">
   			<div class="container-fluid">
@@ -17,23 +17,19 @@
       				<a class="navbar-brand" href="#">Notifications</a>
     			</div>
     			<ul class="nav navbar-nav">
-      				<li class="active" style="font-size: 16px""><a href="/publisher.html">Home Page</a></li>
-    			</ul>
-    			<ul class="nav navbar-nav">
+      				<li class="active" style="font-size: 16px"><a href="/publisher.html">Home Page</a></li>
       				<li class="active" style="font-size: 16px"><a href="#" onclick="create();">New Event</a></li>
-    			</ul>
-     			<ul class="nav navbar-nav">
-    				<li class="active" style="font-size: 16px"><a href="#">Search</li>
+    				<li class="active" style="font-size: 16px"><a href="/search.html">Search</a></li>
     			</ul>
     			<ul class="nav navbar-nav navbar-right">
-    				<p style= "padding-right: 16px; font-size: 16px" class="navbar-text"><span>{{alias}}</span></p>
+    				<p style= "padding-right: 16px; font-size: 16px" class="navbar-text"><span ng-controller="PageData">{{alias}}</span></p>
       				<li><a href="#" onclick="editSettings();"><span class="glyphicon glyphicon-user"></span> Settings</a></li>
       				<li><a href="#" onclick="signOut();"><span class="glyphicon glyphicon-log-in"></span> Sign Out</a></li>
     			</ul>
   			</div>
 		</nav>
 		<!--<button onclick="create();">Create New Events</button>-->
-		<div class="col-md-9" style="padding-top: 80px">
+		<div class="col-md-9" style="padding-top: 80px"  ng-controller="EventsController">
 			<div class="event" ng-repeat="event in events" style="background-color: #f0f0ea; padding: 20px;border-radius: 10px; margin: 5px;">
 				<h3> {{event.fields.name}} @ {{event.fields.location}}</h3>
 				<p> {{event.fields.start_time | date: ' HH:mm dd/MM/yyyy '}} to {{event.fields.end_time | date: ' HH:mm dd/MM/yyyy '}} </p>
@@ -84,12 +80,20 @@
 			function getEventsSuccessFunction(response) {
 				$scope.events = JSON.parse(response.data.eventsJson);
 				console.log($scope.events)
-				$scope.alias = response.data.name;
 			}
 			function getEventsFailureFunction(response) {
 				console.log(response)
 			}
 			$http(getEventsGetOption).then(getEventsSuccessFunction, getEventsFailureFunction);
+			});
+			app.controller("PageData", function($scope,$http) {
+				$scope.alias="";
+				$http({method : 'POST', url: '/user/pageData'}).then(function(response){
+				$scope.alias=response.data.name;
+				console.log(response);
+			},function(response){
+				console.log(response);
+			});
 			});
 		</script>
 </body>

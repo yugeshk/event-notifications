@@ -267,7 +267,7 @@ def getEvents(request):
 	if(baseUserData.userType=='publisher'):
 		settings=publisherSettings.objects.get(profileId=baseUserData)
 		eventsJson = serializers.serialize("json", Event.objects.filter(profileId=baseUserData, start_time__date__gte=now))
-		data = {"eventsJson" : eventsJson, "name" : settings.displayName}
+		data = {"eventsJson" : eventsJson}
 		print(data)
 		return JsonResponse(data)
 	elif(baseUserData.userType=='user'):
@@ -297,12 +297,25 @@ def handleGoogleResponse(request):
 	return redirect('/signUp.html')
 
 @csrf_exempt
-def seacrh(request):
+def search(request):
 	post=request.POST
 	user=baseUser.objects.get(profileId=request.session['profileId'])
-	startTime = datetime.strptime(post['startDate']+' '+post['startTime'],'%m/%d/%Y %H:%M')
-	endTime = datetime.strptime(post['endDate']+' '+post['endTime'],'%m/%d/%Y %H:%M')
-	eventData=Event.objects.filter(start_time__datetime__gte=startTime,end_time__datetime__lte=endTime)
+	startTime = datetime.datetime.strptime(post['startDate']+' '+post['startTime'],'%m/%d/%Y %H:%M')
+	endTime = datetime.datetime.strptime(post['endDate']+' '+post['endTime'],'%m/%d/%Y %H:%M')
+	eventData=Event.objects.filter(start_time__range=(startTime,endTime))
 	eventsJson = serializers.serialize("json", eventData)
-	data = {"eventsJson" : eventsJson, "name" : userSettings.objects.get(profileId=user).displayName}
+	data = {"eventsJson" : eventsJson, "name" : publisherSettings.objects.get(profileId=user).displayName}
+	print(data)
 	return JsonResponse(data)
+
+@csrf_exempt
+def pageData(request):
+	baseUserData=baseUser.objects.get(profileId=request.session['profileId'])
+	if(baseUserData.userType=='publisher'):
+		settings=publisherSettings.objects.get(profileId=baseUserData)
+		data={"name" : settings.displayName}
+		print(data)
+		return JsonResponse(data)
+	elif(baseUserData.userType=='user'):
+		settings=userSettings.objects.get(profileId=baseUserData)
+		return JsonResponse({"name" : baseUserData.name, "roll" : settings.rollNumber, "dept" : settings.department})
