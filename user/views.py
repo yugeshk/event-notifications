@@ -295,9 +295,9 @@ def handleGoogleResponse(request):
 
 @csrf_exempt
 def search(request):
-	post=request.POST
+	post=json.loads(request.body.decode('utf-8'))
 	user=baseUser.objects.get(profileId=request.session['profileId'])
-	print(request)
+	print(post)
 	print("This right here")
 	startTime = datetime.datetime.strptime(post['startDate']+' '+post['startTime'],'%m/%d/%Y %H:%M')
 	endTime = datetime.datetime.strptime(post['endDate']+' '+post['endTime'],'%m/%d/%Y %H:%M')
